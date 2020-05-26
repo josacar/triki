@@ -1,0 +1,23 @@
+name: triki
+version: 0.1.0
+
+dependencies:
+  walker_method:
+    github: josacar/walker_method
+    version: ~> 0.1
+  faker:
+    github: askn/faker
+
+development_dependencies:
+  spectator:
+    gitlab: arctic-fox/spectator
+
+authors:
+  - Jose Luis Salas <josacar@users.noreply.github.com>
+
+license: MIT
+
+crystal: 0.34.0
+
+description: |
+  Mysql, PostgreSQL and SQL dump obfuscator aka anonimizer
