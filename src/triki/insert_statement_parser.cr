@@ -10,7 +10,7 @@ class Triki
           if config[table_name]?
             output_io.puts obfuscator.obfuscate_bulk_insert_line(line, table_name, columns, ignore)
           else
-            Triki.log.warn { "Deprecated: #{table_name} was not specified in the config.  A future release will cause this to be an error.  Please specify the table definition or set it to :keep." }
+            Triki::Log.warn { "Deprecated: #{table_name} was not specified in the config.  A future release will cause this to be an error.  Please specify the table definition or set it to :keep." }
             output_io.print(line)
           end
         else

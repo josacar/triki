@@ -1,5 +1,6 @@
 require "../spec_helper"
 require "spectator"
+require "log/spec"
 
 RowAsHash = Triki::ConfigApplicator::RowAsHash
 
@@ -140,12 +141,12 @@ Spectator.describe Triki::ConfigApplicator do
    end
 
     it "should keep the value when given an unknown type, but should display a warning" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"b" => Triki::ConfigColumnHash{:type => :unknown_type}}, ["a", "b", "c"])
-      expect(new_row.size).to eq(3)
-      expect(new_row[1]).to eq("something_else")
-      error_output = Helpers::Log.io
-      error_output.rewind
-      expect(error_output.gets_to_end).to match(/Keeping a column value by.*?unknown_type/)
+      error_output = Log.capture("triki") do
+        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"b" => Triki::ConfigColumnHash{:type => :unknown_type}}, ["a", "b", "c"])
+        expect(new_row.size).to eq(3)
+        expect(new_row[1]).to eq("something_else")
+      end
+      error_output.check(:warn, /Keeping a column value by.*?unknown_type/)
     end
 
     it "should be able to substitute lorem ipsum text" do

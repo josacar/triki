@@ -1,4 +1,5 @@
 require "./spec_helper"
+require "log/spec"
 
 Spectator.describe Triki do
   describe "Triki.reassembling_each_insert" do
@@ -291,11 +292,11 @@ Spectator.describe Triki do
         end
 
         it "should ignore tables that it doesn't know about, but should warn" do
-          expect(output_string).to contain("INSERT INTO `an_ignored_table` (`col`, `col2`) VALUES ('hello','kjhjd^&dkjh'), ('hello1','kjhj!'), ('hello2','moose!!');")
+          error_output = Log.capture("triki") do
+            expect(output_string).to contain("INSERT INTO `an_ignored_table` (`col`, `col2`) VALUES ('hello','kjhjd^&dkjh'), ('hello1','kjhj!'), ('hello2','moose!!');")
+          end
 
-          error_output = Helpers::Log.io
-          error_output.rewind
-          expect(error_output.gets_to_end).to match(/an_ignored_table was not specified in the config/)
+          error_output.check(:warn, /an_ignored_table was not specified in the config/)
         end
 
         it "should obfuscate the tables" do
@@ -694,13 +695,13 @@ Spectator.describe Triki do
         end
 
         it "should ignore tables that it doesn't know about, but should warn" do
-          expect(output_string).to contain("INSERT [dbo].[an_ignored_table] ([col], [col2]) VALUES (N'hello',N'kjhjd^&dkjh');")
-          expect(output_string).to contain("INSERT [dbo].[an_ignored_table] ([col], [col2]) VALUES (N'hello1',N'kjhj!');")
-          expect(output_string).to contain("INSERT [dbo].[an_ignored_table] ([col], [col2]) VALUES (N'hello2',N'moose!!');")
+          error_output = Log.capture("triki") do
+            expect(output_string).to contain("INSERT [dbo].[an_ignored_table] ([col], [col2]) VALUES (N'hello',N'kjhjd^&dkjh');")
+            expect(output_string).to contain("INSERT [dbo].[an_ignored_table] ([col], [col2]) VALUES (N'hello1',N'kjhj!');")
+            expect(output_string).to contain("INSERT [dbo].[an_ignored_table] ([col], [col2]) VALUES (N'hello2',N'moose!!');")
+          end
 
-          error_output = Helpers::Log.io
-          error_output.rewind
-          expect(error_output.gets_to_end).to match(/an_ignored_table was not specified in the config/)
+          error_output.check(:warn, /an_ignored_table was not specified in the config/)
         end
 
         it "should obfuscate the tables" do

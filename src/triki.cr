@@ -12,6 +12,12 @@ class Triki
   USERNAME_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_" + NUMBER_CHARS
   SENSIBLE_CHARS = USERNAME_CHARS + "+-=[{]}/?|!@#$%^&*()`~"
 
+  Log = begin
+          backend = ::Log::IOBackend.new(STDERR)
+          ::Log.builder.bind("*", :warning, backend)
+          ::Log.for(self)
+        end
+
   # Make a new Triki object.  Pass in a configuration structure to define how the obfuscation should be
   # performed.  See the README.rdoc file for more information.
   alias TableName = String
@@ -40,18 +46,6 @@ class Triki
   def initialize(configuration = ConfigHash.new)
     @config = configuration
     @scaffolded_tables = {} of String => Int32
-  end
-
-  def self.log
-    @@log ||= begin
-                  backend = ::Log::IOBackend.new(STDERR)
-                  ::Log.builder.bind("*", :warning, backend)
-                  ::Log.for(self)
-                end
-  end
-
-  def self.log=(other)
-    @@log = other
   end
 
   def fail_on_unspecified_columns?
