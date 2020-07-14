@@ -61,28 +61,54 @@ obfuscator.obfuscate(STDIN, STDOUT)
 
 And to get an obfuscated dump:
 
-    mysqldump -c --add-drop-table --hex-blob -u user -ppassword database | obfuscator > obfuscated_dump.sql
+```
+mysqldump -c --add-drop-table --hex-blob -u user -ppassword database | obfuscator > obfuscated_dump.sql
+```
 
 Note that the -c option on mysqldump is required to use triki.  Additionally, the default behavior of mysqldump
-is to output special characters. This may cause trouble, so you can request hex-encoded blob content with --hex-blob.
-If you get MySQL errors due to very long lines, try some combination of --max_allowed_packet=128M, --single-transaction, --skip-extended-insert, and --quick.
+is to output special characters. This may cause trouble, so you can request hex-encoded blob content with `--hex-blob`.
+If you get MySQL errors due to very long lines, try some combination of `--max_allowed_packet=128M`, `--single-transaction`, `--skip-extended-insert`, and `--quick`.
 
 ## Database Server
 
-By default the database type is assumed to be MySQL, but you can use the
-builtin SQL Server support by specifying:
+By default the database type is assumed to be MySQL, but you can use the builtin SQL Server support by specifying:
 
-    obfuscator.database_type = :sql_server
-    obfuscator.database_type = :postgres
+```crystal
+obfuscator.database_type = :sql_server
+obfuscator.database_type = :postgres
+```
 
-If using Postgres, use pg_dump to get a dump:
+If using Postgres, use `pg_dump` to get a dump:
 
-    pg_dump database | ruby obfuscator > obfuscated_dump.sql
+```
+pg_dump database | obfuscator > obfuscated_dump.sql
+```
 
 ## Types
 
-Available types include: email, string, lorem, name, first_name, last_name, address, street_address, secondary_address, city, state,
-zip_code, phone, company, ipv4, ipv6, url, integer, fixed, null, and keep.
+Available types include:
+- email
+- string
+- lorem
+- name
+- first_name
+- last_name
+- address
+- street_address
+- secondary_address
+- city
+- state
+- zip_code
+- phone
+- company
+- ipv4
+- ipv6
+- url
+- integer
+- fixed
+- null
+
+and `keep` to keep the same value.
 
 ## Helping with creation of the "obfuscator.cr" script
 
@@ -92,19 +118,25 @@ To run triki in this mode, start with an "empty" scaffolder.cr script as follows
 
 ```crystal
 
-obfuscator = Triki.new(Triki::ConfigHash{})
+obfuscator = Triki.new(Triki::ConfigHash.new)
 obfuscator.scaffold(STDIN, STDOUT)
 ```
 
 Then feed in your database dump:
-  mysqldump -c  --hex-blob -u user -ppassword database | ruby scaffolder > obfuscator_scaffold_snippet
-  pg_dump database | ruby scaffolder > obfuscator_scaffold_snippet
+
+```
+mysqldump -c  --hex-blob -u user -ppassword database | scaffolder > obfuscator_scaffold_snippet
+pg_dump database | scaffolder > obfuscator_scaffold_snippet
+```
 
 The output will be a series of configuration statements of the form:
-    "table_name" => {
-      "column1_name"     => :keep   # scaffold
-      "column2_name"     => :keep   # scaffold
-  	... etc.
+
+```crystal
+  "table_name" => {
+    "column1_name" => :keep   # scaffold
+    "column2_name" => :keep   # scaffold
+    ... etc.
+```
 
 Scaffolding also works if you have a partial configuration.  If your configuration is missing some tables or some columns, a call to 'scaffold' will pass through the configuration that exists and augment it with scaffolding for the missing tables or columns.
 
