@@ -44,7 +44,7 @@ class Triki
   alias ColumnList = Array(String)
 
   def initialize(configuration = ConfigHash.new)
-    @config = configuration
+    @config = ConfigParser.cast_bindings(configuration)
     @scaffolded_tables = {} of String => Int32
   end
 

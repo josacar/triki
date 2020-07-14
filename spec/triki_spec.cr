@@ -48,28 +48,28 @@ Spectator.describe Triki do
       end
 
       let(obfuscator) do
-        Triki.new(Triki::ConfigHash{
-          "some_table" => Triki::ConfigTableHash{
-            "email" => Triki::ConfigColumnHash{
+        Triki.new({
+          "some_table" => {
+            "email" => {
               :type => :email,
               :skip_regexes => [
                 /^[\w\.\_]+@honk\.com$/i,
                 /^dontmurderme@direwolf.com$/
               ]
             },
-            "name" => Triki::ConfigColumnHash{
+            "name" => {
               :type => :string,
               :length => 8,
               :chars => Triki::USERNAME_CHARS
             },
-            "age" => Triki::ConfigColumnHash{
+            "age" => {
               :type => :integer,
               :between => 10...80,
               :unless => :nil
             },
           },
-          "single_column_table" => Triki::ConfigTableHash{
-            "id" => Triki::ConfigColumnHash{
+          "single_column_table" => {
+            "id" => {
               :type => :integer,
               :between => 2..9,
               :unless => :nil
@@ -90,25 +90,25 @@ Spectator.describe Triki do
       end
 
       let(scaffolder) do
-        Triki.new(Triki::ConfigHash{
-          "some_other_table" => Triki::ConfigTableHash{
-            "email" => Triki::ConfigColumnHash{
+        Triki.new({
+          "some_other_table" => {
+            "email" => {
               :type => :email,
               :skip_regexes => [/^[\w\.\_]+@honk\.com$/i, /^dontmurderme@direwolf.com$/]
             },
-            "name" => Triki::ConfigColumnHash{
+            "name" => {
               :type => :string,
               :length => 8,
               :chars => Triki::USERNAME_CHARS
             },
-            "age" => Triki::ConfigColumnHash{
+            "age" => {
               :type => :integer,
               :between => 10...80,
               :unless => :nil
             },
           },
-          "single_column_table" => Triki::ConfigTableHash{
-            "id" => Triki::ConfigColumnHash{
+          "single_column_table" => {
+            "id" => {
               :type => :integer,
               :between => 2..9,
               :unless => :nil
@@ -208,18 +208,18 @@ Spectator.describe Triki do
           INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);
           SQL
           database_dump = IO::Memory.new(string)
-          ddo = Triki.new(Triki::ConfigHash{
-            "some_table" => Triki::ConfigTableHash{
-              "email" => Triki::ConfigColumnHash{
+          ddo = Triki.new({
+            "some_table" => {
+              "email" => {
                 :type => :email,
                 :honk_email_skip => true
               },
-              "name" => Triki::ConfigColumnHash{
+              "name" => {
                 :type => :string,
                 :length => 8,
                 :chars => Triki::USERNAME_CHARS
               },
-              "gender" => Triki::ConfigColumnHash{
+              "gender" => {
                 :type => :fixed,
                 :string => "m"
               }
@@ -244,34 +244,34 @@ Spectator.describe Triki do
           SQL
           database_dump = IO::Memory.new(string)
 
-          ddo = Triki.new(Triki::ConfigHash{
-            "some_table" => Triki::ConfigTableHash{
-              "email" => Triki::ConfigColumnHash{
+          ddo = Triki.new({
+            "some_table" => {
+              "email" => {
                 :type => :email,
                 :skip_regexes => [
                   /^[\w\.\_]+@honk\.com$/i,
                   /^dontmurderme@direwolf.com$/
                 ]
               },
-              "name" => Triki::ConfigColumnHash{
+              "name" => {
                 :type => :string,
                 :length => 8,
                 :chars => Triki::USERNAME_CHARS
               },
-              "age" => Triki::ConfigColumnHash{
+              "age" => {
                 :type => :integer,
                 :between => 10...80
               }
             },
             "another_table" => :truncate,
             "some_table_to_keep" => :keep,
-            "one_more_table" => Triki::ConfigTableHash{
+            "one_more_table" => {
               # Note: fixed strings must be pre-SQL escaped!
-              "password" => Triki::ConfigColumnHash{
+              "password" => {
                 :type => :fixed,
                 :string => "monkey"
               },
-              "c" => Triki::ConfigColumnHash{
+              "c" => {
                 :type => :null
               },
             }
@@ -326,21 +326,21 @@ Spectator.describe Triki do
         end
 
         let(ddo) do
-          ddo = Triki.new(Triki::ConfigHash{
-            "some_table" => Triki::ConfigTableHash{
-              "email" => Triki::ConfigColumnHash{
+          ddo = Triki.new({
+            "some_table" => {
+              "email" => {
                 :type => :email,
                 :skip_regexes => [
                   /^[\w\.\_]+@honk\.com$/i,
                   /^dontmurderme@direwolf.com$/
                 ]
               },
-              "name" => Triki::ConfigColumnHash{
+              "name" => {
                 :type => :string,
                 :length => 8,
                 :chars => Triki::USERNAME_CHARS
               },
-              "age" => Triki::ConfigColumnHash{
+              "age" => {
                 :type => :integer,
                 :between => 10...80
               }
@@ -372,13 +372,13 @@ Spectator.describe Triki do
           IO::Memory.new(string)
         end
         let(output_string) do
-          ddo = Triki.new(Triki::ConfigHash{
-            "some_table" => Triki::ConfigTableHash{
-              "email" => Triki::ConfigColumnHash{
+          ddo = Triki.new({
+            "some_table" => {
+              "email" => {
                 :type => :email,
                 :honk_email_skip => true
               },
-              "name" => Triki::ConfigColumnHash{
+              "name" => {
                 :type => :string,
                 :length => 8,
                 :chars => Triki::USERNAME_CHARS
@@ -414,13 +414,13 @@ Spectator.describe Triki do
           INSERT INTO `some_table` (`email`, `name`, `something`, `age`, `address1`, `address2`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25, '221B Baker St', 'Suite 100'),('joe@joe.com','joe', 'somethingelse2', 54, '1300 Pennsylvania Ave', '2nd floor');
           SQL
           database_dump = IO::Memory.new(string)
-          ddo = Triki.new(Triki::ConfigHash{
-            "some_table" => Triki::ConfigTableHash{
-              "email" => Triki::ConfigColumnHash{
+          ddo = Triki.new({
+            "some_table" => {
+              "email" => {
                 :type => :email,
                 :honk_email_skip => true
               },
-              "name" => Triki::ConfigColumnHash{
+              "name" => {
                 :type => :string,
                 :length => 8,
                 :chars => Triki::USERNAME_CHARS
@@ -453,20 +453,20 @@ Spectator.describe Triki do
           INSERT INTO `some_table` (`email`, `name`, `something`, `age`, `address1`, `address2`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25, '221B Baker St', 'Suite 100'),('joe@joe.com','joe', 'somethingelse2', 54, '1300 Pennsylvania Ave', '2nd floor');
           SQL
           database_dump = IO::Memory.new(string)
-          ddo = Triki.new(Triki::ConfigHash{
-            "some_table" => Triki::ConfigTableHash{
-              "email" => Triki::ConfigColumnHash{
+          ddo = Triki.new({
+            "some_table" => {
+              "email" => {
                 :type => :email,
                 :honk_email_skip => true
               },
-              "name" => Triki::ConfigColumnHash{
+              "name" => {
                 :type => :string,
                 :length => 8,
                 :chars => Triki::USERNAME_CHARS
               },
               "something" => :keep,
               "age" => :keep,
-              "gender" => Triki::ConfigColumnHash{
+              "gender" => {
                 :type => :fixed,
                 :string => "m"
               },
@@ -495,11 +495,11 @@ Spectator.describe Triki do
           INSERT IGNORE INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);
           SQL
           database_dump = IO::Memory.new(string)
-          ddo = Triki.new(Triki::ConfigHash{
-            "some_table" => Triki::ConfigTableHash{
-              "email" => Triki::ConfigColumnHash{:type => :email, :honk_email_skip => true},
-              "name" => Triki::ConfigColumnHash{:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
-              "gender" => Triki::ConfigColumnHash{:type => :fixed, :string => "m"}
+          ddo = Triki.new({
+            "some_table" => {
+              "email" => {:type => :email, :honk_email_skip => true},
+              "name" => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+              "gender" => {:type => :fixed, :string => "m"}
             }})
           output = IO::Memory.new
           ddo.scaffold(database_dump, output)
@@ -523,10 +523,10 @@ Spectator.describe Triki do
           INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);
           SQL
           database_dump = IO::Memory.new(string)
-          ddo = Triki.new(Triki::ConfigHash{
-            "some_table" => Triki::ConfigTableHash{
-              "email" => Triki::ConfigColumnHash{:type => :email, :honk_email_skip => true},
-              "name" => Triki::ConfigColumnHash{:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+          ddo = Triki.new({
+            "some_table" => {
+              "email" => {:type => :email, :honk_email_skip => true},
+              "name" => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
               "something" => :keep,
               "age" => :keep
             }
@@ -550,10 +550,10 @@ Spectator.describe Triki do
           INSERT INTO `some_table` (`email`, `name`, `something`, `age_of_the_individual_who_is_specified_by_this_row_of_the_table`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);
           SQL
           database_dump = IO::Memory.new(string)
-          ddo = Triki.new(Triki::ConfigHash{
-            "some_other_table" => Triki::ConfigTableHash{
-              "email" => Triki::ConfigColumnHash{:type => :email, :honk_email_skip => true},
-              "name" => Triki::ConfigColumnHash{:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+          ddo = Triki.new({
+            "some_other_table" => {
+              "email" => {:type => :email, :honk_email_skip => true},
+              "name" => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
               "something" => :keep,
               "age_of_the_individual_who_is_specified_by_this_row_of_the_table" => :keep
             }})
@@ -605,11 +605,11 @@ Spectator.describe Triki do
         end
 
         let(ddo) do
-          ddo =  Triki.new(Triki::ConfigHash{
-            "some_table" => Triki::ConfigTableHash{
-              "email" => Triki::ConfigColumnHash{:type => :email, :honk_email_skip => true},
-              "name" => Triki::ConfigColumnHash{:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
-              "gender" => Triki::ConfigColumnHash{:type => :fixed, :string => "m"}
+          ddo =  Triki.new({
+            "some_table" => {
+              "email" => {:type => :email, :honk_email_skip => true},
+              "name" => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+              "gender" => {:type => :fixed, :string => "m"}
             }})
           ddo.database_type = :sql_server
           ddo
@@ -644,20 +644,20 @@ Spectator.describe Triki do
           SQL
           database_dump = IO::Memory.new(string)
 
-          ddo = Triki.new(Triki::ConfigHash{
-            "some_table" => Triki::ConfigTableHash{
-              "email" => Triki::ConfigColumnHash{
+          ddo = Triki.new({
+            "some_table" => {
+              "email" => {
                 :type => :email,
                 :skip_regexes => [
                   /^[\w\.\_]+@honk\.com$/i, /^dontmurderme@direwolf.com$/
                 ]
               },
-              "name" => Triki::ConfigColumnHash{
+              "name" => {
                 :type => :string,
                 :length => 8,
                 :chars => Triki::USERNAME_CHARS
               },
-              "age" => Triki::ConfigColumnHash{
+              "age" => {
                 :type => :integer,
                 :between => 10...80
               },
@@ -665,13 +665,13 @@ Spectator.describe Triki do
             },
             "another_table" => :truncate,
             "some_table_to_keep" => :keep,
-            "one_more_table" => Triki::ConfigTableHash{
+            "one_more_table" => {
               # Note: fixed strings must be pre-SQL escaped!
-              "password" => Triki::ConfigColumnHash{
+              "password" => {
                 :type => :fixed,
                 :string => "monkey"
               },
-              "c" => Triki::ConfigColumnHash{
+              "c" => {
                 :type => :null
               }
             }
@@ -735,11 +735,11 @@ Spectator.describe Triki do
         end
 
         let(ddo) do
-          ddo = Triki.new(Triki::ConfigHash{
-            "some_table" => Triki::ConfigTableHash{
-              "email" => Triki::ConfigColumnHash{:type => :email, :skip_regexes => [/^[\w\.\_]+@honk\.com$/i, /^dontmurderme@direwolf.com$/]},
-              "name" => Triki::ConfigColumnHash{:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
-              "age" => Triki::ConfigColumnHash{:type => :integer, :between => 10...80}
+          ddo = Triki.new({
+            "some_table" => {
+              "email" => {:type => :email, :skip_regexes => [/^[\w\.\_]+@honk\.com$/i, /^dontmurderme@direwolf.com$/]},
+              "name" => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+              "age" => {:type => :integer, :between => 10...80}
             }
           })
           ddo.database_type = :sql_server
@@ -767,10 +767,10 @@ Spectator.describe Triki do
           INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
           SQL
           database_dump = IO::Memory.new(string)
-          ddo = Triki.new(Triki::ConfigHash{
-            "some_table" => Triki::ConfigTableHash{
-              "email" => Triki::ConfigColumnHash{:type => :email, :honk_email_skip => true},
-              "name" => Triki::ConfigColumnHash{:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS}
+          ddo = Triki.new({
+            "some_table" => {
+              "email" => {:type => :email, :honk_email_skip => true},
+              "name" => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS}
             }})
           ddo.database_type = :sql_server
           ddo.globally_kept_columns = %w[something]
@@ -795,13 +795,13 @@ Spectator.describe Triki do
           INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
           SQL
           database_dump = IO::Memory.new(string)
-          ddo = Triki.new(Triki::ConfigHash{
-            "some_table" => Triki::ConfigTableHash{
-              "email" => Triki::ConfigColumnHash{:type => :email, :honk_email_skip => true},
-              "name" => Triki::ConfigColumnHash{:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+          ddo = Triki.new({
+            "some_table" => {
+              "email" => {:type => :email, :honk_email_skip => true},
+              "name" => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
               "something" => :keep,
               "age" => :keep,
-              "gender" => Triki::ConfigColumnHash{:type => :fixed, :string => "m"}
+              "gender" => {:type => :fixed, :string => "m"}
             }})
           ddo.database_type = :sql_server
 
@@ -822,11 +822,11 @@ Spectator.describe Triki do
           INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
           SQL
           database_dump = IO::Memory.new(string)
-          ddo = Triki.new(Triki::ConfigHash{
-            "some_table" => Triki::ConfigTableHash{
-              "email" => Triki::ConfigColumnHash{:type => :email, :honk_email_skip => true},
-              "name" => Triki::ConfigColumnHash{:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
-              "gender" => Triki::ConfigColumnHash{:type => :fixed, :string => "m"}
+          ddo = Triki.new({
+            "some_table" => {
+              "email" => {:type => :email, :honk_email_skip => true},
+              "name" => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+              "gender" => {:type => :fixed, :string => "m"}
             }})
           ddo.database_type = :sql_server
 
@@ -852,13 +852,13 @@ Spectator.describe Triki do
           INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
           SQL
           database_dump = IO::Memory.new(string)
-          ddo = Triki.new(Triki::ConfigHash{
-            "some_table" => Triki::ConfigTableHash{
-              "email" => Triki::ConfigColumnHash{
+          ddo = Triki.new({
+            "some_table" => {
+              "email" => {
                 :type => :email,
                 :honk_email_skip => true
               },
-              "name" => Triki::ConfigColumnHash{
+              "name" => {
                 :type => :string,
                 :length => 8,
                 :chars => Triki::USERNAME_CHARS
@@ -888,10 +888,10 @@ Spectator.describe Triki do
           INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
           SQL
           database_dump = IO::Memory.new(string)
-          ddo = Triki.new(Triki::ConfigHash{
-            "some_other_table" => Triki::ConfigTableHash{
-              "email" => Triki::ConfigColumnHash{:type => :email, :honk_email_skip => true},
-              "name" => Triki::ConfigColumnHash{:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+          ddo = Triki.new({
+            "some_other_table" => {
+              "email" => {:type => :email, :honk_email_skip => true},
+              "name" => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
               "something" => :keep,
               "age" => :keep
             }})

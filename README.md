@@ -23,7 +23,7 @@ Make an obfuscator.cr script:
 ```crystal
 require "triki"
 
-obfuscator = Triki.new(Triki::ConfigHash{
+obfuscator = Triki.new({
   "people" => Triki::ConfigTableHash{
     "email"                     => Triki::ConfigColumnHash{ :type => :email, :skip_regexes => [/^[\w\.\_]+@my_company\.com$/i] },
     "ethnicity"                 => :keep,
@@ -117,8 +117,7 @@ you can use triki to do some of that work for you. It can consume your database 
 To run triki in this mode, start with an "empty" scaffolder.cr script as follows:
 
 ```crystal
-
-obfuscator = Triki.new(Triki::ConfigHash.new)
+obfuscator = Triki.new
 obfuscator.scaffold(STDIN, STDOUT)
 ```
 
