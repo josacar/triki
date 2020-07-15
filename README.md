@@ -24,33 +24,31 @@ Make an obfuscator.cr script:
 require "triki"
 
 obfuscator = Triki.new({
-  "people" => Triki::ConfigTableHash{
-    "email"                     => Triki::ConfigColumnHash{ :type => :email, :skip_regexes => [/^[\w\.\_]+@my_company\.com$/i] },
+  "people" => {
+    "email"                     => { :type => :email, :skip_regexes => [/^[\w\.\_]+@my_company\.com$/i] },
     "ethnicity"                 => :keep,
-    "crypted_password"          => Triki::ConfigColumnHash{ :type => :fixed, :string => "SOME_FIXED_PASSWORD_FOR_EASE_OF_DEBUGGING" },
-    "salt"                      => Triki::ConfigColumnHash{ :type => :fixed, :string => "SOME_THING" },
+    "crypted_password"          => { :type => :fixed, :string => "SOME_FIXED_PASSWORD_FOR_EASE_OF_DEBUGGING" },
+    "salt"                      => { :type => :fixed, :string => "SOME_THING" },
     "remember_token"            => :null,
     "remember_token_expires_at" => :null,
-    "age"                       => Triki::ConfigColumnHash{ :type => :null, :unless => ->(person : Triki::ConfigApplicator::RowAsHash) { person["email"] == "hello@example.com" } },
+    "age"                       => { :type => :null, :unless => ->(person : Triki::ConfigApplicator::RowAsHash) { person["email"] == "hello@example.com" } },
     "photo_file_name"           => :null,
     "photo_content_type"        => :null,
     "photo_file_size"           => :null,
     "photo_updated_at"          => :null,
-    "postal_code"               => Triki::ConfigColumnHash{ :type => :fixed, :string => "94109", :unless => ->(person : Triki::ConfigApplicator::RowAsHash) { person["postal_code"] == "12345"} },
+    "postal_code"               => { :type => :fixed, :string => "94109", :unless => ->(person : Triki::ConfigApplicator::RowAsHash) { person["postal_code"] == "12345"} },
     "name"                      => :name,
     "full_address"              => :address,
-    "bio"                       => Triki::ConfigColumnHash{ :type => :lorem, :number => 4 },
-    "relationship_status"       => Triki::ConfigColumnHash{ :type => :fixed, :one_of => ["Single", "Divorced", "Married", "Engaged", "In a Relationship"] },
-    "has_children"              => Triki::ConfigColumnHash{ :type => :integer, :between => 0..1 },
+    "bio"                       => { :type => :lorem, :number => 4 },
+    "relationship_status"       => { :type => :fixed, :one_of => ["Single", "Divorced", "Married", "Engaged", "In a Relationship"] },
+    "has_children"              => { :type => :integer, :between => 0..1 },
   },
-
   "invites"                     => :truncate,
   "invite_requests"             => :truncate,
   "tags"                        => :keep,
-
-  "relationships" => Triki::ConfigTableHash{
+  "relationships" => {
     "account_id"                => :keep,
-    "code"                      => Triki::ConfigColumnHash{ :type => :string, :length => 8, :chars => Triki::USERNAME_CHARS }
+    "code"                      => { :type => :string, :length => 8, :chars => Triki::USERNAME_CHARS }
   }
 })
 obfuscator.fail_on_unspecified_columns = true # if you want it to require every column in the table to be in the above definition
