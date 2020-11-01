@@ -1,5 +1,5 @@
 class Triki
-  class ConfigParser
+  module ConfigParser
     def self.cast_bindings(bindings) : ConfigHash
       type_hash = ConfigHash.new
       bindings.each do |k, v|

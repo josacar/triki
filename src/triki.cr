@@ -53,9 +53,10 @@ class Triki
   end
 
   def database_helper
-    @database_helper ||= if @database_type == :sql_server
+    @database_helper ||= case @database_type
+                         when :sql_server
                            SqlServer.new
-                         elsif @database_type == :postgres
+                         when :postgres
                            Postgres.new
                          else
                            Mysql.new
@@ -119,9 +120,11 @@ class Triki
 
   def obfuscate_bulk_insert_line(line, table_name : String, columns : ColumnList, ignore = false)
     table_config = config[table_name]
-    if table_config == :truncate
+
+    case table_config
+    when :truncate
       ""
-    elsif table_config == :keep
+    when :keep
       line
     else
       raise RuntimeError.new("table_config is not a hash") unless table_config.is_a?(ConfigTableHash)
@@ -134,7 +137,6 @@ class Triki
       end
     end
   end
-
 end
 
 require "./triki/*"
