@@ -1,7 +1,7 @@
 #encoding: UTF-8
 
 class Triki
-  class Mysql
+  struct Mysql
     alias Field = String?
 
     include Triki::InsertStatementParser

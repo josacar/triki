@@ -1,5 +1,5 @@
 class Triki
-  class ConfigApplicator
+  module ConfigApplicator
     alias RowAsHash = Hash(String, RowContent)
     alias RowContent = String | Int32 | Nil
     alias Row = Array(RowContent)
@@ -23,24 +23,21 @@ class Triki
 
         definition = { :type => definition } if definition.is_a?(Symbol)
 
-        number = definition[:number]?
-        between = definition[:between]?
+        number = (definition[:number]? || 1).as(Int32)
+        between = (definition[:between]? || (0..1000)).as(IntRange)
         one_of = definition[:one_of]?
         length = definition[:length]?
         chars = definition[:chars]?
 
-        if definition.has_key?(:unless)
-          proc_or_symbol = definition[:unless]
+        if unless_definition = definition[:unless]?
+          raise "ERROR: 'unless' definition does not return Bool or Symbol" unless unless_definition.is_a?(BoolProc | Symbol)
 
-          raise "ERROR: 'unless' definition does not return Bool or Symbol" unless proc_or_symbol.is_a?(BoolProc | Symbol)
-          unless_check = make_conditional_method(proc_or_symbol, index, row)
+          unless_check = make_conditional_method(unless_definition, index, row)
 
           next if unless_check.call(row_hash)
         end
 
-        if definition.has_key?(:if)
-          if_definition = definition[:if]
-
+        if if_definition = definition[:if]?
           raise "ERROR: 'if' definition does not return Bool or Symbol" unless if_definition.is_a?(BoolProc | Symbol)
 
           if_check = make_conditional_method(if_definition, index, row)
@@ -48,8 +45,8 @@ class Triki
           next unless if_check.call(row_hash)
         end
 
-        if definition[:skip_regexes]? && definition[:skip_regexes].is_a?(Array(Regex))
-          skip_regexes = definition[:skip_regexes].as(Array(Regex))
+        if (skip_regexes = definition[:skip_regexes]?).is_a?(Array(Regex))
+
           next if skip_regexes.any? { |regex| row[index] =~ regex }
         end
 
@@ -60,9 +57,9 @@ class Triki
                      when :string
                        random_string(length || 30, chars.as(String | Nil) || SENSIBLE_CHARS) if length.is_a?(Int32)
                      when :lorem
-                       clean_bad_whitespace(clean_quotes(Faker::Lorem.sentences(number.as(Int32 | Nil) || 1).join(".  ")))
+                       clean_bad_whitespace(clean_quotes(Faker::Lorem.sentences(number).join(".  ")))
                      when :like_english
-                       clean_quotes random_english_sentences(number.as(Int32?) || 1)
+                       clean_quotes random_english_sentences(number)
                      when :name
                        clean_quotes(Faker::Name.name)
                      when :first_name
@@ -92,14 +89,15 @@ class Triki
                      when :url
                        clean_bad_whitespace(Faker::Internet.url)
                      when :integer
-                       random_integer(between.as(IntRange) || (0..1000)).to_s
+                       random_integer(between).to_s
                      when :fixed
                        if one_of.is_a?(Array)
                          one_of.sample.as(String | Int32)
                        else
                          string = definition[:string]
+
                          if string.is_a?(Proc)
-                           if string.is_a?(Proc(Hash(String, String | Nil | Int32), String | Nil | Int32))
+                           if string.is_a?(Proc(Hash(String, RowContent), RowContent))
                              string.call(row_hash)
                            elsif string.is_a?(StringProc)
                              string.call
@@ -141,18 +139,20 @@ class Triki
       end
     end
 
-    def self.random_integer(between : Range(Int32, Int32)) : Int32
+    def self.random_integer(between : IntRange) : Int32
       (between.min + (between.max - between.min) * rand).round.to_i
     end
 
     def self.random_string(length_or_range, chars)
-      range = if length_or_range.is_a?(Int32)
+      range = case length_or_range
+              when .is_a?(Int32)
                 (length_or_range..length_or_range)
-              elsif length_or_range.is_a?(Range)
+              when .is_a?(Range)
                 length_or_range
               else
                 raise "ERROR: 'length' or 'range' es not an Integer or a Range"
               end
+
       times = random_integer(range)
       random_string = ""
       times.times do
@@ -165,7 +165,7 @@ class Triki
       @@walker_method ||= begin
                             words = Array(String).new
                             counts = Array(Int32).new
-                            File.read(File.expand_path(File.join(File.dirname(__FILE__), "data", "en_50K.txt"))).each_line do |line|
+                            File.read(File.expand_path(File.join(__DIR__, "data", "en_50K.txt"))).each_line do |line|
                               word, count = line.split(/\s+/)
                               words << word
                               counts << count.to_i
@@ -192,6 +192,5 @@ class Triki
     def self.clean_bad_whitespace(value)
       value.gsub(/[\n\t\r]/, "")
     end
-
   end
 end

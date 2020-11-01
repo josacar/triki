@@ -1,5 +1,5 @@
 class Triki
-  class Postgres
+  struct Postgres
     include Triki::CopyStatementParser
     include Triki::ConfigScaffoldGenerator
 
