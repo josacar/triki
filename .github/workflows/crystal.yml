@@ -1,0 +1,27 @@
+name: Crystal CI
+
+on: [push, pull_request]
+# push:
+#   branches: [ $default-branch ]
+# pull_request:
+#   branches: [ $default-branch ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    container:
+      image: crystallang/crystal
+
+    steps:
+    - uses: actions/checkout@v2
+    # - name: Crystal Ameba Linter
+    #   id: crystal-ameba
+    #   uses: crystal-ameba/github-action@v0.2.6
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Install dependencies
+      run: shards install
+    - name: Run tests
+      run: crystal spec
