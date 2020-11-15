@@ -1,6 +1,6 @@
 # Triki
 
-[![Build Status](https://travis-ci.org/josacar/triki.svg?branch=master)](https://travis-ci.org/josacar/triki)
+[![Build Status](https://github.com/josacar/triki/workflows/Crystal%20CI/badge.svg)](https://travis-ci.org/josacar/triki)
 
 You want to develop against real production data, but you don't want to violate your users' privacy.  Enter Triki: standalone Crystal code for the selective rewriting of SQL dumps in order to protect user privacy.  It supports MySQL, Postgres, and SQL Server.
 
