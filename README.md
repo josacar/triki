@@ -183,11 +183,11 @@ That's about 6.40x speedup compared to the Ruby version.
 
 * Support for Postgres.  Thanks @samuelreh!
 * Support for SQL Server
-* :unless and :if now support :nil as a shorthand for a Proc that checks for nil
-* :name, :lorem, and :address are all now supported types.  You can pass :number to :lorem to specify how many sentences to generate.  The default is one.
-* <tt>{ :type => :whatever }</tt> is now optional when no additional options are needed.  Just use <tt>:whatever</tt>.
-* Warnings are thrown when an unknown column type or table is encountered.  Use <tt>:keep</tt> in both cases.
-* <tt>{ :type => :fixed, :string => Proc { |row| ... } }</tt> is now available.
+* `:unless` and `:if` now support `:nil` as a shorthand for a Proc that checks for nil
+* `:name`, `:lorem`, and `:address` are all now supported types.  You can pass `:number` to `:lorem` to specify how many sentences to generate.  The default is one.
+* `{ :type => :whatever }` is now optional when no additional options are needed.  Just use `:whatever`.
+* Warnings are thrown when an unknown column type or table is encountered.  Use `:keep` in both cases.
+* `{ :type => :fixed, :string => Proc { |row| ... } }` is now available.
 
 ## Note on Patches/Pull Requests
 
