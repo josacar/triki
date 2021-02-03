@@ -14,12 +14,10 @@ class Triki
 
   Log = begin
           backend = ::Log::IOBackend.new(STDERR)
-          ::Log.builder.bind("*", :warning, backend)
+          ::Log.builder.bind("*", :warn, backend)
           ::Log.for(self)
         end
 
-  # Make a new Triki object.  Pass in a configuration structure to define how the obfuscation should be
-  # performed.  See the README.rdoc file for more information.
   alias TableName = String
   alias ColumnName = String
   alias TruncateOrKeepTable = Symbol
@@ -43,6 +41,8 @@ class Triki
   alias ConfigHash = Hash(TableName, ConfigTable)
   alias ColumnList = Array(String)
 
+  # Make a new Triki object.  Pass in a configuration structure to define how the obfuscation should be
+  # performed.  See the README.rdoc file for more information.
   def initialize(configuration = ConfigHash.new)
     @config = ConfigParser.cast_bindings(configuration)
     @scaffolded_tables = {} of String => Int32
