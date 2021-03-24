@@ -17,7 +17,7 @@ authors:
 
 license: MIT
 
-crystal: 1.0.0
+crystal: "~> 1.0, >= 1.0.0"
 
 description: |
   Mysql, PostgreSQL and SQL dump obfuscator aka anonimizer
