@@ -22,6 +22,6 @@ jobs:
     #   env:
     #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Install dependencies
-      run: shards install --ignore-crystal-version
+      run: shards install
     - name: Run tests
       run: crystal spec
