@@ -833,7 +833,7 @@ Spectator.describe Triki do
           output = IO::Memory.new
           ddo.scaffold(database_dump, output)
           output.rewind
-          output_string = output.gets_to_end
+          output.gets_to_end
         end
 
         it "should scaffold columns that can't be found" do
@@ -901,7 +901,7 @@ Spectator.describe Triki do
           output = IO::Memory.new
           ddo.scaffold(database_dump, output)
           output.rewind
-          output_string = output.gets_to_end
+          output.gets_to_end
         end
 
         it "should scaffold all the columns that are not globally kept" do

@@ -9,6 +9,7 @@ class Triki
     alias BoolProc = Proc(RowAsHash, Bool)
     alias StringProc = Proc(String)
 
+    # ameba:disable Metrics/CyclomaticComplexity
     def self.apply_table_config(row : Array(String?), table_config : Triki::ConfigTableHash, columns : Columns)
       return row unless table_config.is_a?(Hash)
 

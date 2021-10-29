@@ -4,8 +4,8 @@ class Triki
     def generate_config(obfuscator, config, input_io, output_io)
       input_io.each_line(chomp: false) do |line|
         if obfuscator.database_type == :postgres
-          parse_copy_statement = ->(line : String) do
-            if regex_match = /^\s*COPY (.*?) \((.*?)\) FROM\s*/i.match(line)
+          parse_copy_statement = ->(statement_line : String) do
+            if regex_match = /^\s*COPY (.*?) \((.*?)\) FROM\s*/i.match(statement_line)
               {
                 "table_name" => regex_match[1],
                 "column_names" => regex_match[2].split(/\s*,\s*/)
@@ -92,8 +92,5 @@ class Triki
       end
 
     end
-
   end
 end
-
-
