@@ -16,10 +16,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    # - name: Crystal Ameba Linter
-    #   uses: crystal-ameba/github-action@v0.2.12
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Crystal Ameba Linter
+      uses: crystal-ameba/github-action@v0.2.12
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Install dependencies
       run: shards install
     - name: Run tests
