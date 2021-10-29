@@ -11,6 +11,9 @@ dependencies:
 development_dependencies:
   spectator:
     gitlab: arctic-fox/spectator
+  ameba:
+    github: crystal-ameba/ameba
+    version: ~> 0.13.0
 
 authors:
   - Jose Luis Salas <josacar@users.noreply.github.com>
