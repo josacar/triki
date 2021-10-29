@@ -78,7 +78,7 @@ class Triki
   def reassembling_each_insert(line : String, table_name : String, columns, ignore = false)
     output = database_helper.rows_to_be_inserted(line).map do |sub_insert|
       result = yield(sub_insert)
-      result = result.map do |i|
+      result.map do |i|
         database_helper.make_valid_value_string(i)
       end
     end

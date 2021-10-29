@@ -12,14 +12,14 @@ class Triki
         {
             "ignore"     => !regex_match[1]?.nil?,
             "table_name" => regex_match[2],
-            "column_names" => regex_match[3].split(/`\s*,\s*`/).map { |col| col.gsub('`', "") }
+            "column_names" => regex_match[3].split(/`\s*,\s*`/).map(&.gsub('`', ""))
         }
       end
     end
 
     def make_insert_statement(table_name, column_names, values, ignore = nil)
-      values_strings = values.map do |values|
-        "(" + values.join(",") + ")"
+      values_strings = values.map do |string_values|
+        "(" + string_values.join(",") + ")"
       end.join(",")
 
       "INSERT #{ignore ? "IGNORE " : "" }INTO `#{table_name}` (`#{column_names.join("`, `")}`) VALUES #{values_strings};"
@@ -45,12 +45,12 @@ class Triki
     end
 
     # Be aware, strings must be quoted in single quotes!
+    # ameba:disable Metrics/CyclomaticComplexity
     def context_aware_mysql_string_split(string) : Array(Array(String?))
       in_sub_insert = false
       in_quoted_string = false
       escaped = false
       current_field : String? = nil
-      length = string.size
       fields = [] of Field
       output = [] of Array(Field)
 

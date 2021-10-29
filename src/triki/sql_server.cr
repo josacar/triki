@@ -7,7 +7,7 @@ class Triki
       if regex_match = insert_regex.match(line)
         {
             "table_name" => regex_match[1],
-            "column_names" => regex_match[2].split(/\]\s*,\s*\[/).map { |col| col.gsub(/[\[\]]/, "") }
+            "column_names" => regex_match[2].split(/\]\s*,\s*\[/).map(&.gsub(/[\[\]]/, ""))
         }
       end
     end
@@ -28,8 +28,8 @@ class Triki
     end
 
     def make_insert_statement(table_name, column_names, values, ignore = nil)
-      values_strings = values.map do |values|
-        "(" + values.join(",") + ")"
+      values_strings = values.map do |string_values|
+        "(" + string_values.join(",") + ")"
       end.join(",")
 
       "INSERT [dbo].[#{table_name}] ([#{column_names.join("], [")}]) VALUES #{values_strings};"
@@ -39,9 +39,9 @@ class Triki
       /^\s*INSERT (?:INTO )?\[dbo\]\.\[(.*?)\] \((.*?)\) VALUES\s*/i
     end
 
+    # ameba:disable Metrics/CyclomaticComplexity
     private def context_aware_sql_server_string_split(string)
       in_quoted_string = false
-      backslash_escape = false
       previous_char_single_quote = false
       current_field_value = nil
       completed_fields = [] of String?
