@@ -8,33 +8,31 @@ require "log"
 class Triki
   property config, globally_kept_columns = Array(String).new, fail_on_unspecified_columns = false, database_type = :mysql, scaffolded_tables
 
-  NUMBER_CHARS = "1234567890"
+  NUMBER_CHARS   = "1234567890"
   USERNAME_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_" + NUMBER_CHARS
   SENSIBLE_CHARS = USERNAME_CHARS + "+-=[{]}/?|!@#$%^&*()`~"
 
   Log = begin
-          backend = ::Log::IOBackend.new(STDERR)
-          ::Log.builder.bind("*", :warn, backend)
-          ::Log.for(self)
-        end
+    backend = ::Log::IOBackend.new(STDERR)
+    ::Log.builder.bind("*", :warn, backend)
+    ::Log.for(self)
+  end
 
   alias TableName = String
   alias ColumnName = String
   alias TruncateOrKeepTable = Symbol
   alias ColumnAction = Symbol
-  alias Between = Range(Int32,Int32)
-  alias ConfigColumnHash = Hash(Symbol,
-                                Array(Regex) |
-                                Array(String) |
-                                Int32 |
-                                Symbol |
-                                Proc(Hash(ColumnName, String | Int32 | Nil), Bool) |
-                                Proc(Hash(ColumnName, String | Int32 | Nil), String | Int32 | Nil) |
-                                Proc(String) |
-                                String |
-                                Between |
-                                Bool
-                               )
+  alias Between = Range(Int32, Int32)
+  alias ConfigColumnHash = Hash(Symbol, Array(Regex) |
+                                        Array(String) |
+                                        Int32 |
+                                        Symbol |
+                                        Proc(Hash(ColumnName, String | Int32 | Nil), Bool) |
+                                        Proc(Hash(ColumnName, String | Int32 | Nil), String | Int32 | Nil) |
+                                        Proc(String) |
+                                        String |
+                                        Between |
+                                        Bool)
   alias ConfigColumn = ConfigColumnHash | ColumnAction
   alias ConfigTableHash = Hash(ColumnName, ConfigColumn)
   alias ConfigTable = ConfigTableHash | TruncateOrKeepTable

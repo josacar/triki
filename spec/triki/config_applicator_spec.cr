@@ -5,11 +5,10 @@ require "log/spec"
 RowAsHash = Triki::ConfigApplicator::RowAsHash
 
 Spectator.describe Triki::ConfigApplicator do
-
   describe ".apply_table_config" do
     it "should work on email addresses" do
       100.times do
-        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else"], Triki::ConfigTableHash{"a" => Triki::ConfigColumnHash{ :type => :email }}, ["a", "b"])
+        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else"], Triki::ConfigTableHash{"a" => Triki::ConfigColumnHash{:type => :email}}, ["a", "b"])
         expect(new_row.size).to eq(2)
         expect(new_row.first).to match(/^[\w\.]+\@(\w+\.){2,3}[a-f0-9]{5}\.example\.com$/)
       end
@@ -24,35 +23,35 @@ Spectator.describe Triki::ConfigApplicator do
 
     describe "conditional directives" do
       it "should honor :unless conditionals" do
-        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"a"=> Triki::ConfigColumnHash{:type => :fixed, :string => "123", :unless => ->(row : RowAsHash) { row["a"] == "blah" }}}, ["a", "b", "c"])
+        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"a" => Triki::ConfigColumnHash{:type => :fixed, :string => "123", :unless => ->(row : RowAsHash) { row["a"] == "blah" }}}, ["a", "b", "c"])
         expect(new_row[0]).not_to eq("123")
         expect(new_row[0]).to eq("blah")
 
-        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"a"=> Triki::ConfigColumnHash{:type => :fixed, :string => "123", :unless => ->(row : RowAsHash) { row["a"] == "not blah" }}}, ["a", "b", "c"])
+        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"a" => Triki::ConfigColumnHash{:type => :fixed, :string => "123", :unless => ->(row : RowAsHash) { row["a"] == "not blah" }}}, ["a", "b", "c"])
         expect(new_row[0]).to eq("123")
 
-        new_row = Triki::ConfigApplicator.apply_table_config([nil, "something_else", "5"], Triki::ConfigTableHash{"a"=> Triki::ConfigColumnHash{:type => :fixed, :string => "123", :unless => :nil}, "b"=> Triki::ConfigColumnHash{:type => :fixed, :string => "123", :unless => :nil}}, ["a", "b", "c"])
+        new_row = Triki::ConfigApplicator.apply_table_config([nil, "something_else", "5"], Triki::ConfigTableHash{"a" => Triki::ConfigColumnHash{:type => :fixed, :string => "123", :unless => :nil}, "b" => Triki::ConfigColumnHash{:type => :fixed, :string => "123", :unless => :nil}}, ["a", "b", "c"])
         expect(new_row[0]).to eq(nil)
         expect(new_row[1]).to eq("123")
 
-        new_row = Triki::ConfigApplicator.apply_table_config(["", "something_else", "5"], Triki::ConfigTableHash{"a"=> Triki::ConfigColumnHash{:type => :fixed, :string => "123", :unless => :blank}, "b"=> Triki::ConfigColumnHash{:type => :fixed, :string => "123", :unless => :blank}}, ["a", "b", "c"])
+        new_row = Triki::ConfigApplicator.apply_table_config(["", "something_else", "5"], Triki::ConfigTableHash{"a" => Triki::ConfigColumnHash{:type => :fixed, :string => "123", :unless => :blank}, "b" => Triki::ConfigColumnHash{:type => :fixed, :string => "123", :unless => :blank}}, ["a", "b", "c"])
         expect(new_row[0]).to eq("")
         expect(new_row[1]).to eq("123")
       end
 
       it "should honor :if conditionals" do
-        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"a"=> Triki::ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "blah" }}}, ["a", "b", "c"])
+        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"a" => Triki::ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "blah" }}}, ["a", "b", "c"])
         expect(new_row[0]).to eq("123")
 
-        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"a"=> Triki::ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "not blah" }}}, ["a", "b", "c"])
+        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"a" => Triki::ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "not blah" }}}, ["a", "b", "c"])
         expect(new_row[0]).not_to eq("123")
         expect(new_row[0]).to eq("blah")
 
-        new_row = Triki::ConfigApplicator.apply_table_config([nil, "something_else", "5"], Triki::ConfigTableHash{"a"=> Triki::ConfigColumnHash{:type => :fixed, :string => "123", :if => :nil}, "b"=> Triki::ConfigColumnHash{:type => :fixed, :string => "123", :if => :nil}}, ["a", "b", "c"])
+        new_row = Triki::ConfigApplicator.apply_table_config([nil, "something_else", "5"], Triki::ConfigTableHash{"a" => Triki::ConfigColumnHash{:type => :fixed, :string => "123", :if => :nil}, "b" => Triki::ConfigColumnHash{:type => :fixed, :string => "123", :if => :nil}}, ["a", "b", "c"])
         expect(new_row[0]).to eq("123")
         expect(new_row[1]).to eq("something_else")
 
-        new_row = Triki::ConfigApplicator.apply_table_config(["", "something_else", "5"], Triki::ConfigTableHash{"a"=> Triki::ConfigColumnHash{:type => :fixed, :string => "123", :if => :blank}, "b"=> Triki::ConfigColumnHash{:type => :fixed, :string => "123", :if => :blank}}, ["a", "b", "c"])
+        new_row = Triki::ConfigApplicator.apply_table_config(["", "something_else", "5"], Triki::ConfigTableHash{"a" => Triki::ConfigColumnHash{:type => :fixed, :string => "123", :if => :blank}, "b" => Triki::ConfigColumnHash{:type => :fixed, :string => "123", :if => :blank}}, ["a", "b", "c"])
         expect(new_row[0]).to eq("123")
         expect(new_row[1]).to eq("something_else")
       end
@@ -64,20 +63,20 @@ Spectator.describe Triki::ConfigApplicator do
       end
 
       it "should honor combined :unless and :if conditionals" do
-        #both true
-        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"a"=> Triki::ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "blah" }, :unless => ->(row : RowAsHash) { row["b"] == "something_else" }}}, ["a", "b", "c"])
+        # both true
+        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"a" => Triki::ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "blah" }, :unless => ->(row : RowAsHash) { row["b"] == "something_else" }}}, ["a", "b", "c"])
         expect(new_row[0]).to eq("blah")
 
-        #both false
-        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"a"=> Triki::ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "not blah" }, :unless => ->(row : RowAsHash) { row["b"] == "not something_else" }}}, ["a", "b", "c"])
+        # both false
+        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"a" => Triki::ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "not blah" }, :unless => ->(row : RowAsHash) { row["b"] == "not something_else" }}}, ["a", "b", "c"])
         expect(new_row[0]).to eq("blah")
 
-        #if true, #unless false
-        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"a"=> Triki::ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "blah" }, :unless => ->(row : RowAsHash) { row["b"] == "not something_else" }}}, ["a", "b", "c"])
+        # if true, #unless false
+        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"a" => Triki::ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "blah" }, :unless => ->(row : RowAsHash) { row["b"] == "not something_else" }}}, ["a", "b", "c"])
         expect(new_row[0]).to eq("123")
 
-        #if false, #unless true
-        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"a"=> Triki::ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "not blah" }, :unless => ->(row : RowAsHash) { row["b"] == "something_else" }}}, ["a", "b", "c"])
+        # if false, #unless true
+        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"a" => Triki::ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "not blah" }, :unless => ->(row : RowAsHash) { row["b"] == "something_else" }}}, ["a", "b", "c"])
         expect(new_row[0]).to eq("blah")
       end
     end
@@ -121,24 +120,24 @@ Spectator.describe Triki::ConfigApplicator do
       expect(looking_for.size).to eq(0)
     end
 
-   it "should treat a symbol in the column definition as an implicit { :type => symbol }" do
-     new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"b" => :null, "a" => :keep}, ["a", "b", "c"])
-     expect(new_row.size).to eq(3)
-     expect(new_row[0]).to eq("blah")
-     expect(new_row[1]).to eq(nil)
-   end
+    it "should treat a symbol in the column definition as an implicit { :type => symbol }" do
+      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"b" => :null, "a" => :keep}, ["a", "b", "c"])
+      expect(new_row.size).to eq(3)
+      expect(new_row[0]).to eq("blah")
+      expect(new_row[1]).to eq(nil)
+    end
 
-   it "should be able to set things NULL" do
-     new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"b" => Triki::ConfigColumnHash{:type => :null}}, ["a", "b", "c"])
-     expect(new_row.size).to eq(3)
-     expect(new_row[1]).to eq(nil)
-   end
+    it "should be able to set things NULL" do
+      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"b" => Triki::ConfigColumnHash{:type => :null}}, ["a", "b", "c"])
+      expect(new_row.size).to eq(3)
+      expect(new_row[1]).to eq(nil)
+    end
 
-   it "should be able to :keep the value the same" do
-     new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"b" => Triki::ConfigColumnHash{:type => :keep}}, ["a", "b", "c"])
-     expect(new_row.size).to eq(3)
-     expect(new_row[1]).to eq("something_else")
-   end
+    it "should be able to :keep the value the same" do
+      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], Triki::ConfigTableHash{"b" => Triki::ConfigColumnHash{:type => :keep}}, ["a", "b", "c"])
+      expect(new_row.size).to eq(3)
+      expect(new_row[1]).to eq("something_else")
+    end
 
     it "should keep the value when given an unknown type, but should display a warning" do
       error_output = Log.capture("triki") do
@@ -235,7 +234,7 @@ Spectator.describe Triki::ConfigApplicator do
 
     describe "when faker generates values with quotes in them" do
       mock Faker::Address do
-        stub city { "O'ReillyTown"}
+        stub city { "O'ReillyTown" }
       end
 
       mock Faker::Name do
@@ -250,9 +249,9 @@ Spectator.describe Triki::ConfigApplicator do
 
       it "should remove single quotes from the value" do
         new_row = Triki::ConfigApplicator.apply_table_config(["address", "city", "first", "last", "fullname", "some text"],
-                  Triki::ConfigTableHash{"a" => :address, "b" => :city, "c" => :first_name, "d" => :last_name, "e" => :name, "f" => :lorem},
-                  ["a", "b", "c", "d", "e", "f"])
-        new_row.each {|value| expect(value).not_to contain("'")}
+          Triki::ConfigTableHash{"a" => :address, "b" => :city, "c" => :first_name, "d" => :last_name, "e" => :name, "f" => :lorem},
+          ["a", "b", "c", "d", "e", "f"])
+        new_row.each { |value| expect(value).not_to contain("'") }
       end
     end
   end

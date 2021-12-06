@@ -4,7 +4,7 @@ Spectator.describe Triki::SqlServer do
   describe "#parse_insert_statement" do
     it "should return a hash of table_name, column_names for SQL Server input statements" do
       hash = subject.parse_insert_statement("INSERT [dbo].[TASKS] ([TaskID], [TaskName]) VALUES (61, N\"Report Thing\")")
-      expect(hash).to eq({ "table_name" => "TASKS", "column_names" => ["TaskID", "TaskName"] })
+      expect(hash).to eq({"table_name" => "TASKS", "column_names" => ["TaskID", "TaskName"]})
     end
 
     it "should return nil for SQL Server non-insert statements" do
@@ -37,7 +37,7 @@ Spectator.describe Triki::SqlServer do
 
     it "should work with empty strings" do
       string = "INSERT [dbo].[some_table] ([thing1],[thing2]) VALUES (NULL    , N'', ''      , '', 25, '2','',    N'hi','') ;"
-      fields = [[nil, "", "","", "25", "2", "", "hi", ""]]
+      fields = [[nil, "", "", "", "25", "2", "", "hi", ""]]
       expect(subject.rows_to_be_inserted(string)).to eq(fields)
     end
   end

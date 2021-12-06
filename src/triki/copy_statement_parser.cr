@@ -1,6 +1,5 @@
 class Triki
   module CopyStatementParser
-
     # Postgres uses COPY statements instead of INSERT and look like:
     #
     #   COPY some_table (a, b, c, d) FROM stdin;

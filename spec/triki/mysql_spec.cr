@@ -46,12 +46,12 @@ Spectator.describe Triki::Mysql do
       expect(subject.make_valid_value_string(value)).to eq("NULL")
     end
 
-    it "should work with hex-encoded blob data"  do
+    it "should work with hex-encoded blob data" do
       value = "0xACED00057372001F6A6176612E7574696C2E436F6C6C656"
       expect(subject.make_valid_value_string(value)).to eq("0xACED00057372001F6A6176612E7574696C2E436F6C6C656")
     end
 
-    it "should quote hex-encoded ALIKE data"  do
+    it "should quote hex-encoded ALIKE data" do
       value = "40x17x7"
       expect(subject.make_valid_value_string(value)).to eq("'40x17x7'")
     end
@@ -83,5 +83,4 @@ Spectator.describe Triki::Mysql do
       expect(hash).to eq({"ignore" => true, "table_name" => "some_table", "column_names" => ["email", "name", "something", "age"]})
     end
   end
-
 end

@@ -1,14 +1,13 @@
 class Triki
   module ConfigScaffoldGenerator
-
     def generate_config(obfuscator, config, input_io, output_io)
       input_io.each_line(chomp: false) do |line|
         if obfuscator.database_type == :postgres
           parse_copy_statement = ->(statement_line : String) do
             if regex_match = /^\s*COPY (.*?) \((.*?)\) FROM\s*/i.match(statement_line)
               {
-                "table_name" => regex_match[1],
-                "column_names" => regex_match[2].split(/\s*,\s*/)
+                "table_name"   => regex_match[1],
+                "column_names" => regex_match[2].split(/\s*,\s*/),
               }
             end
           end
@@ -19,7 +18,7 @@ class Triki
         next unless table_data
 
         table_name = table_data["table_name"].as(String)
-        next if obfuscator.scaffolded_tables[table_name]?    # only process each table_name once
+        next if obfuscator.scaffolded_tables[table_name]? # only process each table_name once
 
         columns = table_data["column_names"].as(Array(String))
         table_config = config[table_name]?
@@ -50,7 +49,6 @@ class Triki
     end
 
     def emit_scaffold(table_name, existing_config, extra_columns, columns_to_scaffold, output_io)
-
       # header block: contains table name and any existing config
       if existing_config
         output_io.puts(config_table_open(table_name))
@@ -77,7 +75,7 @@ class Triki
     end
 
     def formatted_line(column, definition, comment = nil)
-      colon_string = if (definition.to_s[0]== '{' || definition.to_s[0]== ':')
+      colon_string = if (definition.to_s[0] == '{' || definition.to_s[0] == ':')
                        definition.to_s
                      else
                        ":#{definition}"
@@ -90,7 +88,6 @@ class Triki
       else
         %{    #{column_name} => #{definition},  #{comment}}
       end
-
     end
   end
 end

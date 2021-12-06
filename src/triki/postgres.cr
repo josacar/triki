@@ -30,8 +30,8 @@ class Triki
     def parse_copy_statement(line)
       if regex_match = /^\s*COPY (.*?) \((.*?)\) FROM\s*/i.match(line)
         {
-            "table_name" => regex_match[1],
-            "column_names" => regex_match[2].split(/\s*,\s*/)
+          "table_name"   => regex_match[1],
+          "column_names" => regex_match[2].split(/\s*,\s*/),
         }
       end
     end
@@ -51,6 +51,5 @@ class Triki
     def parse_insert_statement(line)
       /^\s*INSERT INTO/i.match(line)
     end
-
   end
 end

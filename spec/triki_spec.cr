@@ -8,7 +8,7 @@ Spectator.describe Triki do
       test_insert = "INSERT INTO `some_table` (`a`, `b`, `c`, `d`) VALUES ('(\\'bob@bob.com','b()ob','some(thingelse1','25)('),('joe@joe.com','joe','somethingelse2','54');"
       test_insert_passes = [
         ["(\\'bob@bob.com", "b()ob", "some(thingelse1", "25)("],
-        ["joe@joe.com", "joe", "somethingelse2", "54"]
+        ["joe@joe.com", "joe", "somethingelse2", "54"],
       ]
 
       count = 0
@@ -51,32 +51,32 @@ Spectator.describe Triki do
         Triki.new({
           "some_table" => {
             "email" => {
-              :type => :email,
+              :type         => :email,
               :skip_regexes => [
                 /^[\w\.\_]+@honk\.com$/i,
-                /^dontmurderme@direwolf.com$/
-              ]
+                /^dontmurderme@direwolf.com$/,
+              ],
             },
             "name" => {
-              :type => :string,
+              :type   => :string,
               :length => 8,
-              :chars => Triki::USERNAME_CHARS
+              :chars  => Triki::USERNAME_CHARS,
             },
             "age" => {
-              :type => :integer,
+              :type    => :integer,
               :between => 10...80,
-              :unless => :nil
+              :unless  => :nil,
             },
           },
           "single_column_table" => {
             "id" => {
-              :type => :integer,
+              :type    => :integer,
               :between => 2..9,
-              :unless => :nil
-            }
+              :unless  => :nil,
+            },
           },
-          "another_table" => :truncate,
-          "some_table_to_keep" => :keep
+          "another_table"      => :truncate,
+          "some_table_to_keep" => :keep,
         }).tap do |o|
           o.database_type = :postgres
         end
@@ -93,29 +93,29 @@ Spectator.describe Triki do
         Triki.new({
           "some_other_table" => {
             "email" => {
-              :type => :email,
-              :skip_regexes => [/^[\w\.\_]+@honk\.com$/i, /^dontmurderme@direwolf.com$/]
+              :type         => :email,
+              :skip_regexes => [/^[\w\.\_]+@honk\.com$/i, /^dontmurderme@direwolf.com$/],
             },
             "name" => {
-              :type => :string,
+              :type   => :string,
               :length => 8,
-              :chars => Triki::USERNAME_CHARS
+              :chars  => Triki::USERNAME_CHARS,
             },
             "age" => {
-              :type => :integer,
+              :type    => :integer,
               :between => 10...80,
-              :unless => :nil
+              :unless  => :nil,
             },
           },
           "single_column_table" => {
             "id" => {
-              :type => :integer,
+              :type    => :integer,
               :between => 2..9,
-              :unless => :nil
-            }
+              :unless  => :nil,
+            },
           },
-          "another_table" => :truncate,
-          "some_table_to_keep" => :keep
+          "another_table"      => :truncate,
+          "some_table_to_keep" => :keep,
         }).tap do |scaffolder|
           scaffolder.database_type = :postgres
           scaffolder.globally_kept_columns = %w[age]
@@ -204,26 +204,26 @@ Spectator.describe Triki do
 
       context "when the dump to obfuscate is missing columns" do
         it "should raise an error if a column name can't be found" do
-          string =<<-SQL
+          string = <<-SQL
           INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);
           SQL
           database_dump = IO::Memory.new(string)
           ddo = Triki.new({
             "some_table" => {
               "email" => {
-                :type => :email,
-                :honk_email_skip => true
+                :type            => :email,
+                :honk_email_skip => true,
               },
               "name" => {
-                :type => :string,
+                :type   => :string,
                 :length => 8,
-                :chars => Triki::USERNAME_CHARS
+                :chars  => Triki::USERNAME_CHARS,
               },
               "gender" => {
-                :type => :fixed,
-                :string => "m"
-              }
-            }
+                :type   => :fixed,
+                :string => "m",
+              },
+            },
           })
           output = IO::Memory.new
 
@@ -235,7 +235,7 @@ Spectator.describe Triki do
 
       context "when there is something to obfuscate" do
         let(output_string) do
-          string =<<-SQL
+          string = <<-SQL
           INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54),('dontmurderme@direwolf.com','direwolf', 'somethingelse3', 44);
           INSERT INTO `another_table` (`a`, `b`, `c`, `d`) VALUES (1,2,3,4), (5,6,7,8);
           INSERT INTO `some_table_to_keep` (`a`, `b`, `c`, `d`) VALUES (1,2,3,4), (5,6,7,8);
@@ -247,34 +247,34 @@ Spectator.describe Triki do
           ddo = Triki.new({
             "some_table" => {
               "email" => {
-                :type => :email,
+                :type         => :email,
                 :skip_regexes => [
                   /^[\w\.\_]+@honk\.com$/i,
-                  /^dontmurderme@direwolf.com$/
-                ]
+                  /^dontmurderme@direwolf.com$/,
+                ],
               },
               "name" => {
-                :type => :string,
+                :type   => :string,
                 :length => 8,
-                :chars => Triki::USERNAME_CHARS
+                :chars  => Triki::USERNAME_CHARS,
               },
               "age" => {
-                :type => :integer,
-                :between => 10...80
-              }
+                :type    => :integer,
+                :between => 10...80,
+              },
             },
-            "another_table" => :truncate,
+            "another_table"      => :truncate,
             "some_table_to_keep" => :keep,
-            "one_more_table" => {
+            "one_more_table"     => {
               # Note: fixed strings must be pre-SQL escaped!
               "password" => {
-                :type => :fixed,
-                :string => "monkey"
+                :type   => :fixed,
+                :string => "monkey",
               },
               "c" => {
-                :type => :null
+                :type => :null,
               },
-            }
+            },
           })
           output = IO::Memory.new
           ddo.obfuscate(database_dump, output)
@@ -319,7 +319,7 @@ Spectator.describe Triki do
 
       context "when fail_on_unspecified_columns is set to true" do
         let(database_dump) do
-          string =<<-SQL
+          string = <<-SQL
               INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54),('dontmurderme@direwolf.com','direwolf', 'somethingelse3', 44);
           SQL
           IO::Memory.new(string)
@@ -329,22 +329,22 @@ Spectator.describe Triki do
           ddo = Triki.new({
             "some_table" => {
               "email" => {
-                :type => :email,
+                :type         => :email,
                 :skip_regexes => [
                   /^[\w\.\_]+@honk\.com$/i,
-                  /^dontmurderme@direwolf.com$/
-                ]
+                  /^dontmurderme@direwolf.com$/,
+                ],
               },
               "name" => {
-                :type => :string,
+                :type   => :string,
                 :length => 8,
-                :chars => Triki::USERNAME_CHARS
+                :chars  => Triki::USERNAME_CHARS,
               },
               "age" => {
-                :type => :integer,
-                :between => 10...80
-              }
-            }
+                :type    => :integer,
+                :between => 10...80,
+              },
+            },
           })
           ddo.fail_on_unspecified_columns = true
           ddo
@@ -366,7 +366,7 @@ Spectator.describe Triki do
 
       context "when there is an existing config to scaffold" do
         let(database_dump) do
-          string =<<-SQL
+          string = <<-SQL
           INSERT IGNORE INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);
           SQL
           IO::Memory.new(string)
@@ -375,16 +375,16 @@ Spectator.describe Triki do
           ddo = Triki.new({
             "some_table" => {
               "email" => {
-                :type => :email,
-                :honk_email_skip => true
+                :type            => :email,
+                :honk_email_skip => true,
               },
               "name" => {
-                :type => :string,
+                :type   => :string,
                 :length => 8,
-                :chars => Triki::USERNAME_CHARS
-              }
+                :chars  => Triki::USERNAME_CHARS,
+              },
             },
-            "another_table" => :truncate
+            "another_table" => :truncate,
           })
           ddo.globally_kept_columns = %w[something]
           output = IO::Memory.new
@@ -410,26 +410,27 @@ Spectator.describe Triki do
 
       context "when using :secondary_address" do
         let(output_string) do
-          string =<<-SQL
+          string = <<-SQL
           INSERT INTO `some_table` (`email`, `name`, `something`, `age`, `address1`, `address2`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25, '221B Baker St', 'Suite 100'),('joe@joe.com','joe', 'somethingelse2', 54, '1300 Pennsylvania Ave', '2nd floor');
           SQL
           database_dump = IO::Memory.new(string)
           ddo = Triki.new({
             "some_table" => {
               "email" => {
-                :type => :email,
-                :honk_email_skip => true
+                :type            => :email,
+                :honk_email_skip => true,
               },
               "name" => {
-                :type => :string,
+                :type   => :string,
                 :length => 8,
-                :chars => Triki::USERNAME_CHARS
+                :chars  => Triki::USERNAME_CHARS,
               },
               "something" => :keep,
-              "age" => :keep,
-              "address1" => :street_address,
-              "address2" => :secondary_address
-            }})
+              "age"       => :keep,
+              "address1"  => :street_address,
+              "address2"  => :secondary_address,
+            },
+          })
           output = IO::Memory.new
           ddo.obfuscate(database_dump, output)
           output.rewind
@@ -449,30 +450,31 @@ Spectator.describe Triki do
 
       context "when there is an existing config to scaffold" do
         let(output_string) do
-          string =<<-SQL
+          string = <<-SQL
           INSERT INTO `some_table` (`email`, `name`, `something`, `age`, `address1`, `address2`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25, '221B Baker St', 'Suite 100'),('joe@joe.com','joe', 'somethingelse2', 54, '1300 Pennsylvania Ave', '2nd floor');
           SQL
           database_dump = IO::Memory.new(string)
           ddo = Triki.new({
             "some_table" => {
               "email" => {
-                :type => :email,
-                :honk_email_skip => true
+                :type            => :email,
+                :honk_email_skip => true,
               },
               "name" => {
-                :type => :string,
+                :type   => :string,
                 :length => 8,
-                :chars => Triki::USERNAME_CHARS
+                :chars  => Triki::USERNAME_CHARS,
               },
               "something" => :keep,
-              "age" => :keep,
-              "gender" => {
-                :type => :fixed,
-                :string => "m"
+              "age"       => :keep,
+              "gender"    => {
+                :type   => :fixed,
+                :string => "m",
               },
               "address1" => :street_address,
-              "address2" => :secondary_address
-            }})
+              "address2" => :secondary_address,
+            },
+          })
           output = IO::Memory.new
           ddo.scaffold(database_dump, output)
           output.rewind
@@ -491,16 +493,17 @@ Spectator.describe Triki do
 
       context "when there is an existing config to scaffold with both missing and extra columns" do
         let(output_string) do
-          string =<<-SQL
+          string = <<-SQL
           INSERT IGNORE INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);
           SQL
           database_dump = IO::Memory.new(string)
           ddo = Triki.new({
             "some_table" => {
-              "email" => {:type => :email, :honk_email_skip => true},
-              "name" => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
-              "gender" => {:type => :fixed, :string => "m"}
-            }})
+              "email"  => {:type => :email, :honk_email_skip => true},
+              "name"   => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+              "gender" => {:type => :fixed, :string => "m"},
+            },
+          })
           output = IO::Memory.new
           ddo.scaffold(database_dump, output)
           output.rewind
@@ -519,17 +522,17 @@ Spectator.describe Triki do
 
       context "when there is an existing config to scaffold and it is just right" do
         let(output_string) do
-          string =<<-SQL
+          string = <<-SQL
           INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);
           SQL
           database_dump = IO::Memory.new(string)
           ddo = Triki.new({
             "some_table" => {
-              "email" => {:type => :email, :honk_email_skip => true},
-              "name" => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+              "email"     => {:type => :email, :honk_email_skip => true},
+              "name"      => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
               "something" => :keep,
-              "age" => :keep
-            }
+              "age"       => :keep,
+            },
           })
           output = IO::Memory.new
           ddo.scaffold(database_dump, output)
@@ -546,17 +549,18 @@ Spectator.describe Triki do
 
       context "when scaffolding a table with no existing config" do
         let(output_string) do
-          string =<<-SQL
+          string = <<-SQL
           INSERT INTO `some_table` (`email`, `name`, `something`, `age_of_the_individual_who_is_specified_by_this_row_of_the_table`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);
           SQL
           database_dump = IO::Memory.new(string)
           ddo = Triki.new({
             "some_other_table" => {
-              "email" => {:type => :email, :honk_email_skip => true},
-              "name" => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
-              "something" => :keep,
-              "age_of_the_individual_who_is_specified_by_this_row_of_the_table" => :keep
-            }})
+              "email"                                                           => {:type => :email, :honk_email_skip => true},
+              "name"                                                            => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+              "something"                                                       => :keep,
+              "age_of_the_individual_who_is_specified_by_this_row_of_the_table" => :keep,
+            },
+          })
           ddo.globally_kept_columns = %w[name]
 
           output = IO::Memory.new
@@ -577,7 +581,6 @@ Spectator.describe Triki do
         it "should preserve long column names" do
           expect(output_string).to match(/"age_of_the_individual_who_is_specified_by_this_row_of_the_table"/)
         end
-
       end
     end
 
@@ -598,19 +601,20 @@ Spectator.describe Triki do
 
       context "when the dump to obfuscate is missing columns" do
         let(database_dump) do
-          string =<<-SQL
+          string = <<-SQL
             INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
           SQL
           IO::Memory.new(string)
         end
 
         let(ddo) do
-          ddo =  Triki.new({
+          ddo = Triki.new({
             "some_table" => {
-              "email" => {:type => :email, :honk_email_skip => true},
-              "name" => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
-              "gender" => {:type => :fixed, :string => "m"}
-            }})
+              "email"  => {:type => :email, :honk_email_skip => true},
+              "name"   => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+              "gender" => {:type => :fixed, :string => "m"},
+            },
+          })
           ddo.database_type = :sql_server
           ddo
         end
@@ -627,7 +631,7 @@ Spectator.describe Triki do
       context "when there is something to obfuscate" do
         let(error_output) { IO::Memory.new }
         let(output_string) do
-          string =<<-SQL
+          string = <<-SQL
           INSERT [dbo].[some_table] ([email], [name], [something], [age], [bday]) VALUES (N'bob@honk.com',N'bob', N'some''thin,ge())lse1', 25, CAST(0x00009E1A00000000 AS DATETIME));
           INSERT [dbo].[some_table] ([email], [name], [something], [age], [bday]) VALUES (N'joe@joe.com',N'joe', N'somethingelse2', 54, CAST(0x00009E1A00000000 AS DATETIME));
           INSERT [dbo].[some_table] ([email], [name], [something], [age], [bday]) VALUES (N'dontmurderme@direwolf.com',N'direwolf', N'somethingelse3', 44, CAST(0x00009E1A00000000 AS DATETIME));
@@ -647,34 +651,34 @@ Spectator.describe Triki do
           ddo = Triki.new({
             "some_table" => {
               "email" => {
-                :type => :email,
+                :type         => :email,
                 :skip_regexes => [
-                  /^[\w\.\_]+@honk\.com$/i, /^dontmurderme@direwolf.com$/
-                ]
+                  /^[\w\.\_]+@honk\.com$/i, /^dontmurderme@direwolf.com$/,
+                ],
               },
               "name" => {
-                :type => :string,
+                :type   => :string,
                 :length => 8,
-                :chars => Triki::USERNAME_CHARS
+                :chars  => Triki::USERNAME_CHARS,
               },
               "age" => {
-                :type => :integer,
-                :between => 10...80
+                :type    => :integer,
+                :between => 10...80,
               },
-              "bday" => :keep
+              "bday" => :keep,
             },
-            "another_table" => :truncate,
+            "another_table"      => :truncate,
             "some_table_to_keep" => :keep,
-            "one_more_table" => {
+            "one_more_table"     => {
               # Note: fixed strings must be pre-SQL escaped!
               "password" => {
-                :type => :fixed,
-                :string => "monkey"
+                :type   => :fixed,
+                :string => "monkey",
               },
               "c" => {
-                :type => :null
-              }
-            }
+                :type => :null,
+              },
+            },
           })
           ddo.database_type = :sql_server
 
@@ -728,7 +732,7 @@ Spectator.describe Triki do
 
       context "when fail_on_unspecified_columns is set to true" do
         let(database_dump) do
-          string =<<-SQL
+          string = <<-SQL
           INSERT INTO [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
           SQL
           IO::Memory.new(string)
@@ -738,9 +742,9 @@ Spectator.describe Triki do
           ddo = Triki.new({
             "some_table" => {
               "email" => {:type => :email, :skip_regexes => [/^[\w\.\_]+@honk\.com$/i, /^dontmurderme@direwolf.com$/]},
-              "name" => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
-              "age" => {:type => :integer, :between => 10...80}
-            }
+              "name"  => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+              "age"   => {:type => :integer, :between => 10...80},
+            },
           })
           ddo.database_type = :sql_server
           ddo.fail_on_unspecified_columns = true
@@ -763,15 +767,16 @@ Spectator.describe Triki do
 
       context "when there is an existing config to scaffold and it is missing columns" do
         let(output_string) do
-          string =<<-SQL
+          string = <<-SQL
           INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
           SQL
           database_dump = IO::Memory.new(string)
           ddo = Triki.new({
             "some_table" => {
               "email" => {:type => :email, :honk_email_skip => true},
-              "name" => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS}
-            }})
+              "name"  => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+            },
+          })
           ddo.database_type = :sql_server
           ddo.globally_kept_columns = %w[something]
           output = IO::Memory.new
@@ -791,18 +796,19 @@ Spectator.describe Triki do
 
       context "when there is an existing config to scaffold and it has extra columns" do
         let(output_string) do
-          string =<<-SQL
+          string = <<-SQL
           INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
           SQL
           database_dump = IO::Memory.new(string)
           ddo = Triki.new({
             "some_table" => {
-              "email" => {:type => :email, :honk_email_skip => true},
-              "name" => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+              "email"     => {:type => :email, :honk_email_skip => true},
+              "name"      => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
               "something" => :keep,
-              "age" => :keep,
-              "gender" => {:type => :fixed, :string => "m"}
-            }})
+              "age"       => :keep,
+              "gender"    => {:type => :fixed, :string => "m"},
+            },
+          })
           ddo.database_type = :sql_server
 
           output = IO::Memory.new
@@ -818,16 +824,17 @@ Spectator.describe Triki do
 
       context "when there is an existing config to scaffold and it has both missing and extra columns" do
         let(output_string) do
-          string =<<-SQL
+          string = <<-SQL
           INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
           SQL
           database_dump = IO::Memory.new(string)
           ddo = Triki.new({
             "some_table" => {
-              "email" => {:type => :email, :honk_email_skip => true},
-              "name" => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
-              "gender" => {:type => :fixed, :string => "m"}
-            }})
+              "email"  => {:type => :email, :honk_email_skip => true},
+              "name"   => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+              "gender" => {:type => :fixed, :string => "m"},
+            },
+          })
           ddo.database_type = :sql_server
 
           output = IO::Memory.new
@@ -848,24 +855,24 @@ Spectator.describe Triki do
 
       context "when there is an existing config to scaffold and it is just right" do
         let(output_string) do
-          string =<<-SQL
+          string = <<-SQL
           INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
           SQL
           database_dump = IO::Memory.new(string)
           ddo = Triki.new({
             "some_table" => {
               "email" => {
-                :type => :email,
-                :honk_email_skip => true
+                :type            => :email,
+                :honk_email_skip => true,
               },
               "name" => {
-                :type => :string,
+                :type   => :string,
                 :length => 8,
-                :chars => Triki::USERNAME_CHARS
+                :chars  => Triki::USERNAME_CHARS,
               },
               "something" => :keep,
-              "age" => :keep
-            }
+              "age"       => :keep,
+            },
           })
           ddo.database_type = :sql_server
 
@@ -884,17 +891,18 @@ Spectator.describe Triki do
 
       context "when scaffolding a table with no existing config" do
         let(output_string) do
-          string =<<-SQL
+          string = <<-SQL
           INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
           SQL
           database_dump = IO::Memory.new(string)
           ddo = Triki.new({
             "some_other_table" => {
-              "email" => {:type => :email, :honk_email_skip => true},
-              "name" => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+              "email"     => {:type => :email, :honk_email_skip => true},
+              "name"      => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
               "something" => :keep,
-              "age" => :keep
-            }})
+              "age"       => :keep,
+            },
+          })
           ddo.database_type = :sql_server
           ddo.globally_kept_columns = %w[age]
 
@@ -914,7 +922,6 @@ Spectator.describe Triki do
           expect(output_string).not_to match(/"age"\s+=>\s+:keep.+scaffold/)
         end
       end
-
     end
   end
 end

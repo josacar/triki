@@ -6,13 +6,14 @@ class Triki
     def parse_insert_statement(line)
       if regex_match = insert_regex.match(line)
         {
-            "table_name" => regex_match[1],
-            "column_names" => regex_match[2].split(/\]\s*,\s*\[/).map(&.gsub(/[\[\]]/, ""))
+          "table_name"   => regex_match[1],
+          "column_names" => regex_match[2].split(/\]\s*,\s*\[/).map(&.gsub(/[\[\]]/, "")),
         }
       end
     end
 
-    def rows_to_be_inserted(line) Array(Array(String?))
+    def rows_to_be_inserted(line)
+      Array(Array(String?))
       line = line.gsub(insert_regex, "").gsub(/\s*;?\s*$/, "").gsub(/^\(/, "").gsub(/\)$/, "")
       context_aware_sql_server_string_split(line)
     end
