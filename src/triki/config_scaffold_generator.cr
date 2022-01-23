@@ -1,6 +1,8 @@
 class Triki
   module ConfigScaffoldGenerator
     def generate_config(obfuscator, config, input_io, output_io)
+      buffer = IO::Memory.new
+
       input_io.each_line(chomp: false) do |line|
         if obfuscator.database_type == :postgres
           parse_copy_statement = ->(statement_line : String) do
@@ -27,21 +29,30 @@ class Triki
         missing_columns = obfuscator.missing_column_list(table_name, columns)
         extra_columns = obfuscator.extra_column_list(table_name, columns)
 
+        if buffer.pos != 0
+          buffer.to_s(output_io)
+          buffer.clear
+        end
+
         if missing_columns.size == 0 && extra_columns.size == 0
           # all columns are accounted for
-          output_io.puts("\n# All columns in the config for #{table_name.upcase} are present and accounted for.")
+          buffer.puts("\n# All columns in the config for #{table_name.upcase} are present and accounted for.")
         else
           # there are columns missing (or perhaps the whole table is missing); show a scaffold
-          emit_scaffold(table_name, table_config.as(ConfigTableHash?), extra_columns, missing_columns, output_io)
+          emit_scaffold(table_name, table_config.as(ConfigTableHash?), extra_columns, missing_columns, buffer)
         end
 
         # Now that this table_name has been processed, remember it so we don't scaffold it again
         obfuscator.scaffolded_tables[table_name] = 1
       end
+
+      buffer.seek(-1, IO::Seek::Current)
+      buffer.puts("\0")
+      buffer.to_s(output_io)
     end
 
     def config_table_open(table_name)
-      "\n  :#{table_name} => {"
+      %(\n  "#{table_name}" => {)
     end
 
     def config_table_close(table_name)
@@ -71,7 +82,7 @@ class Triki
         formatted_line(column, "keep", "# scaffold")
       end.join("\n").chomp(',')
       output_io.puts scaffold
-      output_io.puts config_table_close(table_name)
+      output_io.print config_table_close(table_name)
     end
 
     def formatted_line(column, definition, comment = nil)
