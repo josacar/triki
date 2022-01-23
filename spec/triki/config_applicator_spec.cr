@@ -2,7 +2,7 @@ require "../spec_helper"
 require "spectator"
 require "log/spec"
 
-RowAsHash = Triki::ConfigApplicator::RowAsHash
+alias RowAsHash = Triki::ConfigApplicator::RowAsHash
 
 Spectator.describe Triki::ConfigApplicator do
   describe ".apply_table_config" do
