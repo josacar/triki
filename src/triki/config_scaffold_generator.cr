@@ -3,6 +3,8 @@ class Triki
     def generate_config(obfuscator, config, input_io, output_io)
       buffer = IO::Memory.new
 
+      output_io.print("SCAFFOLD = {")
+
       input_io.each_line(chomp: false) do |line|
         if obfuscator.database_type == :postgres
           parse_copy_statement = ->(statement_line : String) do
@@ -47,7 +49,7 @@ class Triki
       end
 
       buffer.seek(-1, IO::Seek::Current)
-      buffer.puts("\0")
+      buffer.puts("\n}\0")
       buffer.to_s(output_io)
     end
 

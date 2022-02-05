@@ -541,7 +541,7 @@ Spectator.describe Triki do
         end
 
         it "should say that everything is present and accounted for" do
-          expect(output_string).to match(/^\s*\#.*account/)
+          expect(output_string).to match(/^SCAFFOLD = {\n\s*\#.*account/)
           expect(output_string).not_to contain("scaffold")
           expect(output_string).not_to contain(%{"some_table"})
         end
@@ -883,7 +883,7 @@ Spectator.describe Triki do
         end
 
         it "should say that everything is present and accounted for" do
-          expect(output_string).to match(/^\s*\#.*account/)
+          expect(output_string).to match(/^SCAFFOLD = {\n\s*\#.*account/)
           expect(output_string).not_to contain("scaffold")
           expect(output_string).not_to contain(%{"some_table"})
         end
