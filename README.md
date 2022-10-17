@@ -53,7 +53,7 @@ obfuscator = Triki.new({
 })
 obfuscator.fail_on_unspecified_columns = true # if you want it to require every column in the table to be in the above definition
 obfuscator.globally_kept_columns = %w[id created_at updated_at] # if you set fail_on_unspecified_columns, you may want this as well
-# If you'd like to also validate against your schema.cr file to make sure all fields and tables are present, see https://gist.github.com/cantino/5376e73b0ad806dc4da4
+
 obfuscator.obfuscate(STDIN, STDOUT)
 ```
 
@@ -178,16 +178,6 @@ sys     0m2.192s
 ```
 
 That's about 6.40x speedup compared to the Ruby version.
-
-## Changes
-
-* Support for Postgres.  Thanks @samuelreh!
-* Support for SQL Server
-* `:unless` and `:if` now support `:nil` as a shorthand for a Proc that checks for nil
-* `:name`, `:lorem`, and `:address` are all now supported types.  You can pass `:number` to `:lorem` to specify how many sentences to generate.  The default is one.
-* `{ :type => :whatever }` is now optional when no additional options are needed.  Just use `:whatever`.
-* Warnings are thrown when an unknown column type or table is encountered.  Use `:keep` in both cases.
-* `{ :type => :fixed, :string => Proc { |row| ... } }` is now available.
 
 ## Note on Patches/Pull Requests
 
