@@ -9,8 +9,6 @@ dependencies:
     github: askn/faker
 
 development_dependencies:
-  spectator:
-    gitlab: arctic-fox/spectator
   ameba:
     github: crystal-ameba/ameba
     version: ~> 0.13.0

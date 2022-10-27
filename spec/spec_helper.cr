@@ -1,8 +1,4 @@
 require "../src/*"
-require "spectator"
-
-Spectator.configure do |config|
-  config.fail_fast = true
-end
+require "spec"
 
 Log.setup_from_env(default_level: :none)

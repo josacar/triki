@@ -1,7 +1,7 @@
 require "./spec_helper"
 require "log/spec"
 
-Spectator.describe Triki do
+describe Triki do
   describe "Triki.reassembling_each_insert" do
     it "should yield each subinsert and reassemble the result" do
       column_names = ["a", "b", "c", "d"]
@@ -13,177 +13,204 @@ Spectator.describe Triki do
 
       count = 0
       reassembled = Triki.new.reassembling_each_insert(test_insert, "some_table", column_names) do |sub_insert|
-        expect(sub_insert).to eq(test_insert_passes.shift)
+        sub_insert.should eq(test_insert_passes.shift)
         count += 1
         sub_insert
       end
-      expect(count).to eq(2)
-      expect(reassembled).to eq(test_insert)
+      count.should eq(2)
+      reassembled.should eq(test_insert)
     end
   end
 
   describe "#obfuscate" do
     describe "when using Postgres" do
-      let(dump) do
-        IO::Memory.new(<<-'SQL')
-          COPY some_table (id, email, name, something, age) FROM stdin;
-          1	hello	monkey	moose	14
-          \.
+      dump = IO::Memory.new(<<-'SQL')
+        COPY some_table (id, email, name, something, age) FROM stdin;
+        1	hello	monkey	moose	14
+        \.
 
-          COPY single_column_table (id) FROM stdin;
-          1
-          2
-          \N
-          \.
+        COPY single_column_table (id) FROM stdin;
+        1
+        2
+        \N
+        \.
 
-          COPY another_table (a, b, c, d) FROM stdin;
-          1	2	3	4
-          1	2	3	4
-          \.
+        COPY another_table (a, b, c, d) FROM stdin;
+        1	2	3	4
+        1	2	3	4
+        \.
 
-          COPY some_table_to_keep (a, b) FROM stdin;
-          5	6
-          \.
-          SQL
-      end
+        COPY some_table_to_keep (a, b) FROM stdin;
+        5	6
+        \.
+        SQL
 
-      let(obfuscator) do
-        Triki.new({
-          "some_table" => {
-            "email" => {
-              :type         => :email,
-              :skip_regexes => [
-                /^[\w\.\_]+@honk\.com$/i,
-                /^dontmurderme@direwolf.com$/,
-              ],
-            },
-            "name" => {
-              :type   => :string,
-              :length => 8,
-              :chars  => Triki::USERNAME_CHARS,
-            },
-            "age" => {
-              :type    => :integer,
-              :between => 10...80,
-              :unless  => :nil,
-            },
+      obfuscator = Triki.new({
+        "some_table" => {
+          "email" => {
+            :type         => :email,
+            :skip_regexes => [
+              /^[\w\.\_]+@honk\.com$/i,
+              /^dontmurderme@direwolf.com$/,
+            ],
           },
-          "single_column_table" => {
-            "id" => {
-              :type    => :integer,
-              :between => 2..9,
-              :unless  => :nil,
-            },
+          "name" => {
+            :type   => :string,
+            :length => 8,
+            :chars  => Triki::USERNAME_CHARS,
           },
-          "another_table"      => :truncate,
-          "some_table_to_keep" => :keep,
-        }).tap do |o|
-          o.database_type = :postgres
-        end
+          "age" => {
+            :type    => :integer,
+            :between => 10...80,
+            :unless  => :nil,
+          },
+        },
+        "single_column_table" => {
+          "id" => {
+            :type    => :integer,
+            :between => 2..9,
+            :unless  => :nil,
+          },
+        },
+        "another_table"      => :truncate,
+        "some_table_to_keep" => :keep,
+      }).tap do |o|
+        o.database_type = :postgres
       end
 
-      let(output_string) do
-        output = IO::Memory.new
-        obfuscator.obfuscate(dump, output)
-        output.rewind
-        output.gets_to_end
+      output = IO::Memory.new
+      dump.rewind
+      obfuscator.obfuscate(dump, output)
+      output.rewind
+      output_string = output.gets_to_end
+
+      scaffolder = Triki.new({
+        "some_other_table" => {
+          "email" => {
+            :type         => :email,
+            :skip_regexes => [/^[\w\.\_]+@honk\.com$/i, /^dontmurderme@direwolf.com$/],
+          },
+          "name" => {
+            :type   => :string,
+            :length => 8,
+            :chars  => Triki::USERNAME_CHARS,
+          },
+          "age" => {
+            :type    => :integer,
+            :between => 10...80,
+            :unless  => :nil,
+          },
+        },
+        "single_column_table" => {
+          "id" => {
+            :type    => :integer,
+            :between => 2..9,
+            :unless  => :nil,
+          },
+        },
+        "another_table"      => :truncate,
+        "some_table_to_keep" => :keep,
+      }).tap do |my_scaffolder|
+        my_scaffolder.database_type = :postgres
+        my_scaffolder.globally_kept_columns = %w[age]
       end
 
-      let(scaffolder) do
-        Triki.new({
-          "some_other_table" => {
-            "email" => {
-              :type         => :email,
-              :skip_regexes => [/^[\w\.\_]+@honk\.com$/i, /^dontmurderme@direwolf.com$/],
-            },
-            "name" => {
-              :type   => :string,
-              :length => 8,
-              :chars  => Triki::USERNAME_CHARS,
-            },
-            "age" => {
-              :type    => :integer,
-              :between => 10...80,
-              :unless  => :nil,
-            },
-          },
-          "single_column_table" => {
-            "id" => {
-              :type    => :integer,
-              :between => 2..9,
-              :unless  => :nil,
-            },
-          },
-          "another_table"      => :truncate,
-          "some_table_to_keep" => :keep,
-        }).tap do |scaffolder|
-          scaffolder.database_type = :postgres
-          scaffolder.globally_kept_columns = %w[age]
-        end
-      end
-
-      let(scaffold_output_string) do
-        output = IO::Memory.new
-        scaffolder.scaffold(dump, output)
-        output.rewind
-        output.gets_to_end
-      end
+      output = IO::Memory.new
+      dump.rewind
+      scaffolder.scaffold(dump, output)
+      output.rewind
+      scaffold_output_string = output.gets_to_end
 
       it "is able to obfuscate single column tables" do
-        expect(output_string).not_to contain("1\n2\n")
-        expect(output_string).to match(/\d\n\d\n/)
+        output_string.should_not contain("1\n2\n")
+        output_string.should match(/\d\n\d\n/)
       end
 
       it "is able to truncate tables" do
-        expect(output_string).not_to contain("1\t2\t3\t4")
+        output_string.should_not contain("1\t2\t3\t4")
       end
 
       it "can obfuscate the tables" do
-        expect(output_string).to contain("COPY some_table (id, email, name, something, age) FROM stdin;\n")
-        expect(output_string).to match(/1\t.*\t\S{8}\tmoose\t\d{2}\n/)
+        output_string.should contain("COPY some_table (id, email, name, something, age) FROM stdin;\n")
+        output_string.should match(/1\t.*\t\S{8}\tmoose\t\d{2}\n/)
       end
 
       it "can skip nils" do
-        expect(output_string).to match(/\d\n\d\n\\N/)
+        output_string.should match(/\d\n\d\n\\N/)
       end
 
       it "is able to keep tables" do
-        expect(output_string).to contain("5\t6")
+        output_string.should contain("5\t6")
       end
 
       context "when dump contains INSERT statement" do
-        let(dump) do
-          IO::Memory.new(<<-SQL)
+        error_dump = IO::Memory.new(<<-SQL)
           INSERT INTO some_table (email, name, something, age) VALUES ('','', '', 25);
           SQL
-        end
+
 
         it "raises an error if using postgres with insert statements" do
-          expect_raises(RuntimeError) { output_string }
+          expect_raises(RuntimeError) do
+            obfuscator = Triki.new({
+              "some_table" => {
+                "email" => {
+                  :type         => :email,
+                  :skip_regexes => [
+                    /^[\w\.\_]+@honk\.com$/i,
+                    /^dontmurderme@direwolf.com$/,
+                  ],
+                },
+                "name" => {
+                  :type   => :string,
+                  :length => 8,
+                  :chars  => Triki::USERNAME_CHARS,
+                },
+                "age" => {
+                  :type    => :integer,
+                  :between => 10...80,
+                  :unless  => :nil,
+                },
+              },
+              "single_column_table" => {
+                "id" => {
+                  :type    => :integer,
+                  :between => 2..9,
+                  :unless  => :nil,
+                },
+              },
+              "another_table"      => :truncate,
+              "some_table_to_keep" => :keep,
+            }).tap do |o|
+              o.database_type = :postgres
+            end
+
+            output = IO::Memory.new
+            obfuscator.obfuscate(error_dump, output)
+            output.rewind
+            output.gets_to_end
+          end
         end
       end
 
       it "when there is no existing config, should scaffold all the columns that are not globally kept" do
-        expect(scaffold_output_string).to match(/"email"\s+=>\s+:keep.+scaffold/)
-        expect(scaffold_output_string).to match(/"name"\s+=>\s+:keep.+scaffold/)
+        scaffold_output_string.should match(/"email"\s+=>\s+:keep.+scaffold/)
+        scaffold_output_string.should match(/"name"\s+=>\s+:keep.+scaffold/)
       end
 
       it "should not scaffold a columns that is globally kept" do
-        expect(scaffold_output_string).not_to match(/"age"\s+=>\s+:keep.+scaffold/)
+        scaffold_output_string.should_not match(/"age"\s+=>\s+:keep.+scaffold/)
       end
 
       context "when dump contains a '.' at the end of the line" do
-        let(dump) do
-          IO::Memory.new(<<-'SQL')
+        dump = IO::Memory.new(<<-'SQL')
             COPY another_table (a, b, c, d) FROM stdin;
             1    2       3       4
             1    2       3       .
             \.
             SQL
-        end
 
         it "should not fail if a insert statement ends in a '.''" do
-          expect(output_string).not_to match(/1\t2\t3\t\./)
+          output_string.should_not match(/1\t2\t3\t\./)
         end
       end
     end
@@ -198,7 +225,7 @@ Spectator.describe Triki do
           ddo.obfuscate(input, output)
           input.rewind
           output.rewind
-          expect(output.gets_to_end).to eq(string)
+          output.gets_to_end.should eq(string)
         end
       end
 
@@ -234,7 +261,6 @@ Spectator.describe Triki do
       end
 
       context "when there is something to obfuscate" do
-        let(output_string) do
           string = <<-SQL
           INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54),('dontmurderme@direwolf.com','direwolf', 'somethingelse3', 44);
           INSERT INTO `another_table` (`a`, `b`, `c`, `d`) VALUES (1,2,3,4), (5,6,7,8);
@@ -279,76 +305,108 @@ Spectator.describe Triki do
           output = IO::Memory.new
           ddo.obfuscate(database_dump, output)
           output.rewind
-          output.gets_to_end
-        end
+          output_string = output.gets_to_end
 
         it "should be able to truncate tables" do
-          expect(output_string).not_to contain("INSERT INTO `another_table`")
-          expect(output_string).to contain("INSERT INTO `one_more_table`")
+          output_string.should_not contain("INSERT INTO `another_table`")
+          output_string.should contain("INSERT INTO `one_more_table`")
         end
 
         it "should be able to declare tables to keep" do
-          expect(output_string).to contain("INSERT INTO `some_table_to_keep` (`a`, `b`, `c`, `d`) VALUES (1,2,3,4), (5,6,7,8);")
+          output_string.should contain("INSERT INTO `some_table_to_keep` (`a`, `b`, `c`, `d`) VALUES (1,2,3,4), (5,6,7,8);")
         end
 
         it "should ignore tables that it doesn't know about, but should warn" do
-          error_output = Log.capture("triki") do
-            expect(output_string).to contain("INSERT INTO `an_ignored_table` (`col`, `col2`) VALUES ('hello','kjhjd^&dkjh'), ('hello1','kjhj!'), ('hello2','moose!!');")
+          error_output_log = Log.capture("triki") do
+            ddo = Triki.new({
+              "some_table" => {
+                "email" => {
+                  :type         => :email,
+                  :skip_regexes => [
+                    /^[\w\.\_]+@honk\.com$/i,
+                    /^dontmurderme@direwolf.com$/,
+                  ],
+                },
+                "name" => {
+                  :type   => :string,
+                  :length => 8,
+                  :chars  => Triki::USERNAME_CHARS,
+                },
+                "age" => {
+                  :type    => :integer,
+                  :between => 10...80,
+                },
+              },
+              "another_table"      => :truncate,
+              "some_table_to_keep" => :keep,
+              "one_more_table"     => {
+                # Note: fixed strings must be pre-SQL escaped!
+                "password" => {
+                  :type   => :fixed,
+                  :string => "monkey",
+                },
+                "c" => {
+                  :type => :null,
+                },
+              },
+            })
+            output = IO::Memory.new
+            database_dump.rewind
+            ddo.obfuscate(database_dump, output)
+            output.rewind
+            output_string = output.gets_to_end
+
+            output_string.should contain("INSERT INTO `an_ignored_table` (`col`, `col2`) VALUES ('hello','kjhjd^&dkjh'), ('hello1','kjhj!'), ('hello2','moose!!');")
           end
 
-          error_output.check(:warn, /an_ignored_table was not specified in the config/)
+          error_output_log.check(:warn, /an_ignored_table was not specified in the config/)
         end
 
         it "should obfuscate the tables" do
-          expect(output_string).to contain("INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES (")
-          expect(output_string).to contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES (")
-          expect(output_string).to contain("'some\\'thin,ge())lse1'")
-          expect(output_string).to contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES ('hello','monkey',NULL,'wadus'),('hello1','monkey',NULL,'tradus'),('hello2','monkey',NULL,NULL);")
-          expect(output_string).not_to contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES ('hello','kjhjd^&dkjh',NULL, 'wadus'),('hello1','kjhj!',NULL, 'tradus'),('hello2','moose!!',NULL, NULL);")
-          expect(output_string).not_to contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES ('hello','kjhjd^&dkjh',NULL,'wadus'),('hello1','kjhj!',NULL,'tradus'),('hello2','moose!!',NULL,NULL);")
-          expect(output_string).not_to contain("INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);")
+          output_string.should contain("INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES (")
+          output_string.should contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES (")
+          output_string.should contain("'some\\'thin,ge())lse1'")
+          output_string.should contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES ('hello','monkey',NULL,'wadus'),('hello1','monkey',NULL,'tradus'),('hello2','monkey',NULL,NULL);")
+          output_string.should_not contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES ('hello','kjhjd^&dkjh',NULL, 'wadus'),('hello1','kjhj!',NULL, 'tradus'),('hello2','moose!!',NULL, NULL);")
+          output_string.should_not contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES ('hello','kjhjd^&dkjh',NULL,'wadus'),('hello1','kjhj!',NULL,'tradus'),('hello2','moose!!',NULL,NULL);")
+          output_string.should_not contain("INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);")
         end
 
         it "honors a special case: on the people table, rows with skip_regexes that match are skipped" do
-          expect(output_string).to contain("('bob@honk.com',")
-          expect(output_string).to contain("('dontmurderme@direwolf.com',")
-          expect(output_string).not_to contain("joe@joe.com")
-          expect(output_string).to contain("example.com")
+          output_string.should contain("('bob@honk.com',")
+          output_string.should contain("('dontmurderme@direwolf.com',")
+          output_string.should_not contain("joe@joe.com")
+          output_string.should contain("example.com")
         end
       end
 
       context "when fail_on_unspecified_columns is set to true" do
-        let(database_dump) do
-          string = <<-SQL
+        string = <<-SQL
               INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54),('dontmurderme@direwolf.com','direwolf', 'somethingelse3', 44);
           SQL
-          IO::Memory.new(string)
-        end
+        database_dump = IO::Memory.new(string)
 
-        let(ddo) do
-          ddo = Triki.new({
-            "some_table" => {
-              "email" => {
-                :type         => :email,
-                :skip_regexes => [
-                  /^[\w\.\_]+@honk\.com$/i,
-                  /^dontmurderme@direwolf.com$/,
-                ],
-              },
-              "name" => {
-                :type   => :string,
-                :length => 8,
-                :chars  => Triki::USERNAME_CHARS,
-              },
-              "age" => {
-                :type    => :integer,
-                :between => 10...80,
-              },
+        ddo = Triki.new({
+          "some_table" => {
+            "email" => {
+              :type         => :email,
+              :skip_regexes => [
+                /^[\w\.\_]+@honk\.com$/i,
+                /^dontmurderme@direwolf.com$/,
+              ],
             },
-          })
-          ddo.fail_on_unspecified_columns = true
-          ddo
-        end
+            "name" => {
+              :type   => :string,
+              :length => 8,
+              :chars  => Triki::USERNAME_CHARS,
+            },
+            "age" => {
+              :type    => :integer,
+              :between => 10...80,
+            },
+          },
+        })
+        ddo.fail_on_unspecified_columns = true
 
         it "should raise an exception when an unspecified column is found" do
           expect_raises(RuntimeError, /column 'something' defined/i) do
@@ -358,228 +416,213 @@ Spectator.describe Triki do
 
         it "should accept columns defined in globally_kept_columns" do
           ddo.globally_kept_columns = %w[something]
-          expect {
-            ddo.obfuscate(database_dump, IO::Memory.new)
-          }.not_to raise_error
+          ddo.obfuscate(database_dump, IO::Memory.new)
         end
       end
 
       context "when there is an existing config to scaffold" do
-        let(database_dump) do
-          string = <<-SQL
-          INSERT IGNORE INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);
-          SQL
-          IO::Memory.new(string)
-        end
-        let(output_string) do
-          ddo = Triki.new({
-            "some_table" => {
-              "email" => {
-                :type            => :email,
-                :honk_email_skip => true,
-              },
-              "name" => {
-                :type   => :string,
-                :length => 8,
-                :chars  => Triki::USERNAME_CHARS,
-              },
+        string = <<-SQL
+        INSERT IGNORE INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);
+        SQL
+        database_dump = IO::Memory.new(string)
+
+        ddo = Triki.new({
+          "some_table" => {
+            "email" => {
+              :type            => :email,
+              :honk_email_skip => true,
             },
-            "another_table" => :truncate,
-          })
-          ddo.globally_kept_columns = %w[something]
-          output = IO::Memory.new
-          ddo.scaffold(database_dump, output)
-          output.rewind
-          output.gets_to_end
-        end
+            "name" => {
+              :type   => :string,
+              :length => 8,
+              :chars  => Triki::USERNAME_CHARS,
+            },
+          },
+          "another_table" => :truncate,
+        })
+        ddo.globally_kept_columns = %w[something]
+        output = IO::Memory.new
+        ddo.scaffold(database_dump, output)
+        output.rewind
+        output_string = output.gets_to_end
 
         it "should scaffold missing columns" do
-          expect(output_string).to match(/"age"\s+=>\s+:keep.+scaffold/)
+          output_string.should match(/"age"\s+=>\s+:keep.+scaffold/)
         end
 
         it "should not scaffold globally_kept_columns" do
-          expect(output_string).not_to match(/"something"\s+=>\s+:keep.+scaffold/)
+          output_string.should_not match(/"something"\s+=>\s+:keep.+scaffold/)
         end
 
         it "should pass through correct columns" do
-          expect(output_string).not_to match(/"email"\s+=>\s+:keep.+scaffold/)
-          expect(output_string).to match(/"email"\s+=>/)
-          expect(output_string).not_to match(/\#\s*"email"/)
+          output_string.should_not match(/"email"\s+=>\s+:keep.+scaffold/)
+          output_string.should match(/"email"\s+=>/)
+          output_string.should_not match(/\#\s*"email"/)
         end
       end
 
       context "when using :secondary_address" do
-        let(output_string) do
-          string = <<-SQL
-          INSERT INTO `some_table` (`email`, `name`, `something`, `age`, `address1`, `address2`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25, '221B Baker St', 'Suite 100'),('joe@joe.com','joe', 'somethingelse2', 54, '1300 Pennsylvania Ave', '2nd floor');
-          SQL
-          database_dump = IO::Memory.new(string)
-          ddo = Triki.new({
-            "some_table" => {
-              "email" => {
-                :type            => :email,
-                :honk_email_skip => true,
-              },
-              "name" => {
-                :type   => :string,
-                :length => 8,
-                :chars  => Triki::USERNAME_CHARS,
-              },
-              "something" => :keep,
-              "age"       => :keep,
-              "address1"  => :street_address,
-              "address2"  => :secondary_address,
+        string = <<-SQL
+        INSERT INTO `some_table` (`email`, `name`, `something`, `age`, `address1`, `address2`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25, '221B Baker St', 'Suite 100'),('joe@joe.com','joe', 'somethingelse2', 54, '1300 Pennsylvania Ave', '2nd floor');
+        SQL
+        database_dump = IO::Memory.new(string)
+        ddo = Triki.new({
+          "some_table" => {
+            "email" => {
+              :type            => :email,
+              :honk_email_skip => true,
             },
-          })
-          output = IO::Memory.new
-          ddo.obfuscate(database_dump, output)
-          output.rewind
-          output.gets_to_end
-        end
+            "name" => {
+              :type   => :string,
+              :length => 8,
+              :chars  => Triki::USERNAME_CHARS,
+            },
+            "something" => :keep,
+            "age"       => :keep,
+            "address1"  => :street_address,
+            "address2"  => :secondary_address,
+          },
+        })
+        output = IO::Memory.new
+        ddo.obfuscate(database_dump, output)
+        output.rewind
+        output_string = output.gets_to_end
 
         it "should obfuscate address1" do
-          expect(output_string).to contain("address1")
-          expect(output_string).not_to contain("Baker St")
+          output_string.should contain("address1")
+          output_string.should_not contain("Baker St")
         end
 
         it "should obfuscate address2" do
-          expect(output_string).to contain("address2")
-          expect(output_string).not_to contain("Suite 100")
+          output_string.should contain("address2")
+          output_string.should_not contain("Suite 100")
         end
       end
 
       context "when there is an existing config to scaffold" do
-        let(output_string) do
-          string = <<-SQL
-          INSERT INTO `some_table` (`email`, `name`, `something`, `age`, `address1`, `address2`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25, '221B Baker St', 'Suite 100'),('joe@joe.com','joe', 'somethingelse2', 54, '1300 Pennsylvania Ave', '2nd floor');
-          SQL
-          database_dump = IO::Memory.new(string)
-          ddo = Triki.new({
-            "some_table" => {
-              "email" => {
-                :type            => :email,
-                :honk_email_skip => true,
-              },
-              "name" => {
-                :type   => :string,
-                :length => 8,
-                :chars  => Triki::USERNAME_CHARS,
-              },
-              "something" => :keep,
-              "age"       => :keep,
-              "gender"    => {
-                :type   => :fixed,
-                :string => "m",
-              },
-              "address1" => :street_address,
-              "address2" => :secondary_address,
+        string = <<-SQL
+        INSERT INTO `some_table` (`email`, `name`, `something`, `age`, `address1`, `address2`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25, '221B Baker St', 'Suite 100'),('joe@joe.com','joe', 'somethingelse2', 54, '1300 Pennsylvania Ave', '2nd floor');
+        SQL
+        database_dump = IO::Memory.new(string)
+        ddo = Triki.new({
+          "some_table" => {
+            "email" => {
+              :type            => :email,
+              :honk_email_skip => true,
             },
-          })
-          output = IO::Memory.new
-          ddo.scaffold(database_dump, output)
-          output.rewind
-          output.gets_to_end
-        end
+            "name" => {
+              :type   => :string,
+              :length => 8,
+              :chars  => Triki::USERNAME_CHARS,
+            },
+            "something" => :keep,
+            "age"       => :keep,
+            "gender"    => {
+              :type   => :fixed,
+              :string => "m",
+            },
+            "address1" => :street_address,
+            "address2" => :secondary_address,
+          },
+        })
+        output = IO::Memory.new
+        ddo.scaffold(database_dump, output)
+        output.rewind
+        output_string = output.gets_to_end
 
         it "should enumerate extra columns" do
-          expect(output_string).to match(/\#\s*"gender"\s+=>\s+\{:type\s*=>\s*:fixed,\s*:string.*#\s*unreferenced/)
+          output_string.should match(/\#\s*"gender"\s+=>\s+\{:type\s*=>\s*:fixed,\s*:string.*#\s*unreferenced/)
         end
 
         it "should pass through existing columns" do
-          expect(output_string).to match(/"age"\s+=>\s+:keep\s*,/)
-          expect(output_string).to match(/"address2"\s+=>\s*:secondary_address/)
+          output_string.should match(/"age"\s+=>\s+:keep\s*,/)
+          output_string.should match(/"address2"\s+=>\s*:secondary_address/)
         end
       end
 
       context "when there is an existing config to scaffold with both missing and extra columns" do
-        let(output_string) do
-          string = <<-SQL
-          INSERT IGNORE INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);
-          SQL
-          database_dump = IO::Memory.new(string)
-          ddo = Triki.new({
-            "some_table" => {
-              "email"  => {:type => :email, :honk_email_skip => true},
-              "name"   => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
-              "gender" => {:type => :fixed, :string => "m"},
-            },
-          })
-          output = IO::Memory.new
-          ddo.scaffold(database_dump, output)
-          output.rewind
-          output.gets_to_end
-        end
+        string = <<-SQL
+        INSERT IGNORE INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);
+        SQL
+        database_dump = IO::Memory.new(string)
+        ddo = Triki.new({
+          "some_table" => {
+            "email"  => {:type => :email, :honk_email_skip => true},
+            "name"   => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+            "gender" => {:type => :fixed, :string => "m"},
+          },
+        })
+        output = IO::Memory.new
+        ddo.scaffold(database_dump, output)
+        output.rewind
+        output_string =output.gets_to_end
 
         it "should scaffold missing columns" do
-          expect(output_string).to match(/"age"\s+=>\s+:keep.+scaffold/)
-          expect(output_string).to match(/"something"\s+=>\s+:keep.+scaffold/)
+          output_string.should match(/"age"\s+=>\s+:keep.+scaffold/)
+          output_string.should match(/"something"\s+=>\s+:keep.+scaffold/)
         end
 
         it "should enumerate extra columns" do
-          expect(output_string).to match(/\#\s*"gender"/)
+          output_string.should match(/\#\s*"gender"/)
         end
       end
 
       context "when there is an existing config to scaffold and it is just right" do
-        let(output_string) do
-          string = <<-SQL
-          INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);
-          SQL
-          database_dump = IO::Memory.new(string)
-          ddo = Triki.new({
-            "some_table" => {
-              "email"     => {:type => :email, :honk_email_skip => true},
-              "name"      => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
-              "something" => :keep,
-              "age"       => :keep,
-            },
-          })
-          output = IO::Memory.new
-          ddo.scaffold(database_dump, output)
-          output.rewind
-          output.gets_to_end
-        end
+        string = <<-SQL
+        INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);
+        SQL
+        database_dump = IO::Memory.new(string)
+        ddo = Triki.new({
+          "some_table" => {
+            "email"     => {:type => :email, :honk_email_skip => true},
+            "name"      => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+            "something" => :keep,
+            "age"       => :keep,
+          },
+        })
+        output = IO::Memory.new
+        ddo.scaffold(database_dump, output)
+        output.rewind
+        output_string = output.gets_to_end
 
         it "should say that everything is present and accounted for" do
-          expect(output_string).to match(/^\s*\#.*account/)
-          expect(output_string).not_to contain("scaffold")
-          expect(output_string).not_to contain(%{"some_table"})
+          output_string.should match(/^\s*\#.*account/)
+          output_string.should_not contain("scaffold")
+          output_string.should_not contain(%{"some_table"})
         end
       end
 
       context "when scaffolding a table with no existing config" do
-        let(output_string) do
-          string = <<-SQL
-          INSERT INTO `some_table` (`email`, `name`, `something`, `age_of_the_individual_who_is_specified_by_this_row_of_the_table`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);
-          SQL
-          database_dump = IO::Memory.new(string)
-          ddo = Triki.new({
-            "some_other_table" => {
-              "email"                                                           => {:type => :email, :honk_email_skip => true},
-              "name"                                                            => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
-              "something"                                                       => :keep,
-              "age_of_the_individual_who_is_specified_by_this_row_of_the_table" => :keep,
-            },
-          })
-          ddo.globally_kept_columns = %w[name]
+        string = <<-SQL
+        INSERT INTO `some_table` (`email`, `name`, `something`, `age_of_the_individual_who_is_specified_by_this_row_of_the_table`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);
+        SQL
+        database_dump = IO::Memory.new(string)
+        ddo = Triki.new({
+          "some_other_table" => {
+            "email"                                                           => {:type => :email, :honk_email_skip => true},
+            "name"                                                            => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+            "something"                                                       => :keep,
+            "age_of_the_individual_who_is_specified_by_this_row_of_the_table" => :keep,
+          },
+        })
+        ddo.globally_kept_columns = %w[name]
 
-          output = IO::Memory.new
-          ddo.scaffold(database_dump, output)
-          output.rewind
-          output.gets_to_end
-        end
+        output = IO::Memory.new
+        ddo.scaffold(database_dump, output)
+        output.rewind
+        output_string = output.gets_to_end
 
         it "should scaffold all the columns that are not globally kept" do
-          expect(output_string).to match(/"email"\s+=>\s+:keep.+scaffold/)
-          expect(output_string).to match(/"something"\s+=>\s+:keep.+scaffold/)
+          output_string.should match(/"email"\s+=>\s+:keep.+scaffold/)
+          output_string.should match(/"something"\s+=>\s+:keep.+scaffold/)
         end
 
         it "should not scaffold globally kept columns" do
-          expect(output_string).not_to match(/"name"\s+=>\s+:keep.+scaffold/)
+          output_string.should_not match(/"name"\s+=>\s+:keep.+scaffold/)
         end
 
         it "should preserve long column names" do
-          expect(output_string).to match(/"age_of_the_individual_who_is_specified_by_this_row_of_the_table"/)
+          output_string.should match(/"age_of_the_individual_who_is_specified_by_this_row_of_the_table"/)
         end
       end
     end
@@ -595,31 +638,25 @@ Spectator.describe Triki do
           ddo.obfuscate(input, output)
           input.rewind
           output.rewind
-          expect(output.gets_to_end).to eq(string)
+          output.gets_to_end.should eq(string)
         end
       end
 
       context "when the dump to obfuscate is missing columns" do
-        let(database_dump) do
-          string = <<-SQL
-            INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
-          SQL
-          IO::Memory.new(string)
-        end
+        string = <<-SQL
+          INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
+        SQL
+        database_dump = IO::Memory.new(string)
 
-        let(ddo) do
-          ddo = Triki.new({
-            "some_table" => {
-              "email"  => {:type => :email, :honk_email_skip => true},
-              "name"   => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
-              "gender" => {:type => :fixed, :string => "m"},
-            },
-          })
-          ddo.database_type = :sql_server
-          ddo
-        end
-
-        let(output) { IO::Memory.new }
+        ddo = Triki.new({
+          "some_table" => {
+            "email"  => {:type => :email, :honk_email_skip => true},
+            "name"   => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+            "gender" => {:type => :fixed, :string => "m"},
+          },
+        })
+        ddo.database_type = :sql_server
+        output =  IO::Memory.new
 
         it "should raise an error if a column name can't be found" do
           expect_raises(RuntimeError) do
@@ -629,297 +666,317 @@ Spectator.describe Triki do
       end
 
       context "when there is something to obfuscate" do
-        let(error_output) { IO::Memory.new }
-        let(output_string) do
-          string = <<-SQL
-          INSERT [dbo].[some_table] ([email], [name], [something], [age], [bday]) VALUES (N'bob@honk.com',N'bob', N'some''thin,ge())lse1', 25, CAST(0x00009E1A00000000 AS DATETIME));
-          INSERT [dbo].[some_table] ([email], [name], [something], [age], [bday]) VALUES (N'joe@joe.com',N'joe', N'somethingelse2', 54, CAST(0x00009E1A00000000 AS DATETIME));
-          INSERT [dbo].[some_table] ([email], [name], [something], [age], [bday]) VALUES (N'dontmurderme@direwolf.com',N'direwolf', N'somethingelse3', 44, CAST(0x00009E1A00000000 AS DATETIME));
-          INSERT [dbo].[another_table] ([a], [b], [c], [d]) VALUES (1,2,3,4);
-          INSERT [dbo].[another_table] ([a], [b], [c], [d]) VALUES (5,6,7,8);
-          INSERT [dbo].[some_table_to_keep] ([a], [b], [c], [d]) VALUES (1,2,3,4);
-          INSERT [dbo].[some_table_to_keep] ([a], [b], [c], [d]) VALUES (5,6,7,8);
-          INSERT [dbo].[one_more_table] ([a], [password], [c], [d,d]) VALUES (N'hello',N'kjhjd^&dkjh', N'aawefjkafe', N'wadus');
-          INSERT [dbo].[one_more_table] ([a], [password], [c], [d,d]) VALUES (N'hello1',N'kjhj!', 892938, N'wadus');
-          INSERT [dbo].[one_more_table] ([a], [password], [c], [d,d]) VALUES (N'hello2',N'moose!!', NULL, N'wadus');
-          INSERT [dbo].[an_ignored_table] ([col], [col2]) VALUES (N'hello',N'kjhjd^&dkjh');
-          INSERT [dbo].[an_ignored_table] ([col], [col2]) VALUES (N'hello1',N'kjhj!');
-          INSERT [dbo].[an_ignored_table] ([col], [col2]) VALUES (N'hello2',N'moose!!');
-          SQL
-          database_dump = IO::Memory.new(string)
+        string = <<-SQL
+        INSERT [dbo].[some_table] ([email], [name], [something], [age], [bday]) VALUES (N'bob@honk.com',N'bob', N'some''thin,ge())lse1', 25, CAST(0x00009E1A00000000 AS DATETIME));
+        INSERT [dbo].[some_table] ([email], [name], [something], [age], [bday]) VALUES (N'joe@joe.com',N'joe', N'somethingelse2', 54, CAST(0x00009E1A00000000 AS DATETIME));
+        INSERT [dbo].[some_table] ([email], [name], [something], [age], [bday]) VALUES (N'dontmurderme@direwolf.com',N'direwolf', N'somethingelse3', 44, CAST(0x00009E1A00000000 AS DATETIME));
+        INSERT [dbo].[another_table] ([a], [b], [c], [d]) VALUES (1,2,3,4);
+        INSERT [dbo].[another_table] ([a], [b], [c], [d]) VALUES (5,6,7,8);
+        INSERT [dbo].[some_table_to_keep] ([a], [b], [c], [d]) VALUES (1,2,3,4);
+        INSERT [dbo].[some_table_to_keep] ([a], [b], [c], [d]) VALUES (5,6,7,8);
+        INSERT [dbo].[one_more_table] ([a], [password], [c], [d,d]) VALUES (N'hello',N'kjhjd^&dkjh', N'aawefjkafe', N'wadus');
+        INSERT [dbo].[one_more_table] ([a], [password], [c], [d,d]) VALUES (N'hello1',N'kjhj!', 892938, N'wadus');
+        INSERT [dbo].[one_more_table] ([a], [password], [c], [d,d]) VALUES (N'hello2',N'moose!!', NULL, N'wadus');
+        INSERT [dbo].[an_ignored_table] ([col], [col2]) VALUES (N'hello',N'kjhjd^&dkjh');
+        INSERT [dbo].[an_ignored_table] ([col], [col2]) VALUES (N'hello1',N'kjhj!');
+        INSERT [dbo].[an_ignored_table] ([col], [col2]) VALUES (N'hello2',N'moose!!');
+        SQL
+        database_dump = IO::Memory.new(string)
 
-          ddo = Triki.new({
-            "some_table" => {
-              "email" => {
-                :type         => :email,
-                :skip_regexes => [
-                  /^[\w\.\_]+@honk\.com$/i, /^dontmurderme@direwolf.com$/,
-                ],
-              },
-              "name" => {
-                :type   => :string,
-                :length => 8,
-                :chars  => Triki::USERNAME_CHARS,
-              },
-              "age" => {
-                :type    => :integer,
-                :between => 10...80,
-              },
-              "bday" => :keep,
+        ddo = Triki.new({
+          "some_table" => {
+            "email" => {
+              :type         => :email,
+              :skip_regexes => [
+                /^[\w\.\_]+@honk\.com$/i, /^dontmurderme@direwolf.com$/,
+              ],
             },
-            "another_table"      => :truncate,
-            "some_table_to_keep" => :keep,
-            "one_more_table"     => {
-              # Note: fixed strings must be pre-SQL escaped!
-              "password" => {
-                :type   => :fixed,
-                :string => "monkey",
-              },
-              "c" => {
-                :type => :null,
-              },
+            "name" => {
+              :type   => :string,
+              :length => 8,
+              :chars  => Triki::USERNAME_CHARS,
             },
-          })
-          ddo.database_type = :sql_server
+            "age" => {
+              :type    => :integer,
+              :between => 10...80,
+            },
+            "bday" => :keep,
+          },
+          "another_table"      => :truncate,
+          "some_table_to_keep" => :keep,
+          "one_more_table"     => {
+            # Note: fixed strings must be pre-SQL escaped!
+            "password" => {
+              :type   => :fixed,
+              :string => "monkey",
+            },
+            "c" => {
+              :type => :null,
+            },
+          },
+        })
+        ddo.database_type = :sql_server
 
-          output = IO::Memory.new
-          ddo.obfuscate(database_dump, output)
-          output.rewind
-          output.gets_to_end
-        end
+        output = IO::Memory.new
+        ddo.obfuscate(database_dump, output)
+        output.rewind
+        output_string = output.gets_to_end
 
         it "should be able to truncate tables" do
-          expect(output_string).not_to contain("INSERT [dbo].[another_table]")
-          expect(output_string).to contain("INSERT [dbo].[one_more_table]")
+          output_string.should_not contain("INSERT [dbo].[another_table]")
+          output_string.should contain("INSERT [dbo].[one_more_table]")
         end
 
         it "should be able to declare tables to keep" do
-          expect(output_string).to contain("INSERT [dbo].[some_table_to_keep] ([a], [b], [c], [d]) VALUES (1,2,3,4);")
-          expect(output_string).to contain("INSERT [dbo].[some_table_to_keep] ([a], [b], [c], [d]) VALUES (5,6,7,8);")
+          output_string.should contain("INSERT [dbo].[some_table_to_keep] ([a], [b], [c], [d]) VALUES (1,2,3,4);")
+          output_string.should contain("INSERT [dbo].[some_table_to_keep] ([a], [b], [c], [d]) VALUES (5,6,7,8);")
         end
 
         it "should ignore tables that it doesn't know about, but should warn" do
-          error_output = Log.capture("triki") do
-            expect(output_string).to contain("INSERT [dbo].[an_ignored_table] ([col], [col2]) VALUES (N'hello',N'kjhjd^&dkjh');")
-            expect(output_string).to contain("INSERT [dbo].[an_ignored_table] ([col], [col2]) VALUES (N'hello1',N'kjhj!');")
-            expect(output_string).to contain("INSERT [dbo].[an_ignored_table] ([col], [col2]) VALUES (N'hello2',N'moose!!');")
+          error_output_log = Log.capture("triki") do
+            ddo = Triki.new({
+              "some_table" => {
+                "email" => {
+                  :type         => :email,
+                  :skip_regexes => [
+                    /^[\w\.\_]+@honk\.com$/i, /^dontmurderme@direwolf.com$/,
+                  ],
+                },
+                "name" => {
+                  :type   => :string,
+                  :length => 8,
+                  :chars  => Triki::USERNAME_CHARS,
+                },
+                "age" => {
+                  :type    => :integer,
+                  :between => 10...80,
+                },
+                "bday" => :keep,
+              },
+              "another_table"      => :truncate,
+              "some_table_to_keep" => :keep,
+              "one_more_table"     => {
+                # Note: fixed strings must be pre-SQL escaped!
+                "password" => {
+                  :type   => :fixed,
+                  :string => "monkey",
+                },
+                "c" => {
+                  :type => :null,
+                },
+              },
+            })
+            ddo.database_type = :sql_server
+
+            output = IO::Memory.new
+            database_dump.rewind
+            ddo.obfuscate(database_dump, output)
+            output.rewind
+            output_string = output.gets_to_end
+
+            output_string.should contain("INSERT [dbo].[an_ignored_table] ([col], [col2]) VALUES (N'hello',N'kjhjd^&dkjh');")
+            output_string.should contain("INSERT [dbo].[an_ignored_table] ([col], [col2]) VALUES (N'hello1',N'kjhj!');")
+            output_string.should contain("INSERT [dbo].[an_ignored_table] ([col], [col2]) VALUES (N'hello2',N'moose!!');")
           end
 
-          error_output.check(:warn, /an_ignored_table was not specified in the config/)
+          error_output_log.check(:warn, /an_ignored_table was not specified in the config/)
         end
 
         it "should obfuscate the tables" do
-          expect(output_string).to contain("INSERT [dbo].[some_table] ([email], [name], [something], [age], [bday]) VALUES (")
-          expect(output_string).to contain("CAST(0x00009E1A00000000 AS DATETIME)")
-          expect(output_string).to contain("INSERT [dbo].[one_more_table] ([a], [password], [c], [d,d]) VALUES (")
-          expect(output_string).to contain("'some''thin,ge())lse1'")
-          expect(output_string).to contain("INSERT [dbo].[one_more_table] ([a], [password], [c], [d,d]) VALUES (N'hello',N'monkey',NULL,N'wadus');")
-          expect(output_string).to contain("INSERT [dbo].[one_more_table] ([a], [password], [c], [d,d]) VALUES (N'hello1',N'monkey',NULL,N'wadus');")
-          expect(output_string).to contain("INSERT [dbo].[one_more_table] ([a], [password], [c], [d,d]) VALUES (N'hello2',N'monkey',NULL,N'wadus');")
-          expect(output_string).not_to contain("INSERT [dbo].[one_more_table] ([a], [password], [c], [d,d]) VALUES (N'hello',N'kjhjd^&dkjh', N'aawefjkafe');")
-          expect(output_string).not_to contain("INSERT [dbo].[one_more_table] ([a], [password], [c], [d,d]) VALUES (N'hello1',N'kjhj!', 892938);")
-          expect(output_string).not_to contain("INSERT [dbo].[one_more_table] ([a], [password], [c], [d,d]) VALUES (N'hello2',N'moose!!', NULL);")
-          expect(output_string).not_to contain("INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES (N'bob@honk.com',N'bob', N'some''thin,ge())lse1', 25, CAST(0x00009E1A00000000 AS DATETIME));")
-          expect(output_string).not_to contain("INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES (N'joe@joe.com',N'joe', N'somethingelse2', 54, CAST(0x00009E1A00000000 AS DATETIME));")
+          output_string.should contain("INSERT [dbo].[some_table] ([email], [name], [something], [age], [bday]) VALUES (")
+          output_string.should contain("CAST(0x00009E1A00000000 AS DATETIME)")
+          output_string.should contain("INSERT [dbo].[one_more_table] ([a], [password], [c], [d,d]) VALUES (")
+          output_string.should contain("'some''thin,ge())lse1'")
+          output_string.should contain("INSERT [dbo].[one_more_table] ([a], [password], [c], [d,d]) VALUES (N'hello',N'monkey',NULL,N'wadus');")
+          output_string.should contain("INSERT [dbo].[one_more_table] ([a], [password], [c], [d,d]) VALUES (N'hello1',N'monkey',NULL,N'wadus');")
+          output_string.should contain("INSERT [dbo].[one_more_table] ([a], [password], [c], [d,d]) VALUES (N'hello2',N'monkey',NULL,N'wadus');")
+          output_string.should_not contain("INSERT [dbo].[one_more_table] ([a], [password], [c], [d,d]) VALUES (N'hello',N'kjhjd^&dkjh', N'aawefjkafe');")
+          output_string.should_not contain("INSERT [dbo].[one_more_table] ([a], [password], [c], [d,d]) VALUES (N'hello1',N'kjhj!', 892938);")
+          output_string.should_not contain("INSERT [dbo].[one_more_table] ([a], [password], [c], [d,d]) VALUES (N'hello2',N'moose!!', NULL);")
+          output_string.should_not contain("INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES (N'bob@honk.com',N'bob', N'some''thin,ge())lse1', 25, CAST(0x00009E1A00000000 AS DATETIME));")
+          output_string.should_not contain("INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES (N'joe@joe.com',N'joe', N'somethingelse2', 54, CAST(0x00009E1A00000000 AS DATETIME));")
         end
 
         it "honors a special case: on the people table, rows with anything@honk.com in a slot marked with :honk_email_skip do not change this slot" do
-          expect(output_string).to contain("(N'bob@honk.com',")
-          expect(output_string).to contain("(N'dontmurderme@direwolf.com',")
-          expect(output_string).not_to contain("joe@joe.com")
+          output_string.should contain("(N'bob@honk.com',")
+          output_string.should contain("(N'dontmurderme@direwolf.com',")
+          output_string.should_not contain("joe@joe.com")
         end
       end
 
       context "when fail_on_unspecified_columns is set to true" do
-        let(database_dump) do
-          string = <<-SQL
-          INSERT INTO [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
-          SQL
-          IO::Memory.new(string)
-        end
+        string = <<-SQL
+        INSERT INTO [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
+        SQL
+        database_dump = IO::Memory.new(string)
 
-        let(ddo) do
-          ddo = Triki.new({
-            "some_table" => {
-              "email" => {:type => :email, :skip_regexes => [/^[\w\.\_]+@honk\.com$/i, /^dontmurderme@direwolf.com$/]},
-              "name"  => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
-              "age"   => {:type => :integer, :between => 10...80},
-            },
-          })
-          ddo.database_type = :sql_server
-          ddo.fail_on_unspecified_columns = true
-          ddo
-        end
+        ddo = Triki.new({
+          "some_table" => {
+            "email" => {:type => :email, :skip_regexes => [/^[\w\.\_]+@honk\.com$/i, /^dontmurderme@direwolf.com$/]},
+            "name"  => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+            "age"   => {:type => :integer, :between => 10...80},
+          },
+        })
+        ddo.database_type = :sql_server
+        ddo.fail_on_unspecified_columns = true
 
         it "should raise an exception when an unspecified column is found" do
-          expect {
+          expect_raises(Exception, /column 'something' defined/i) do
             ddo.obfuscate(database_dump, IO::Memory.new)
-          }.to raise_error(/column 'something' defined/i)
+          end
         end
 
         it "should accept columns defined in globally_kept_columns" do
           ddo.globally_kept_columns = %w[something]
-          expect {
-            ddo.obfuscate(database_dump, IO::Memory.new)
-          }.not_to raise_error
+          ddo.obfuscate(database_dump, IO::Memory.new)
         end
       end
 
       context "when there is an existing config to scaffold and it is missing columns" do
-        let(output_string) do
-          string = <<-SQL
-          INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
-          SQL
-          database_dump = IO::Memory.new(string)
-          ddo = Triki.new({
-            "some_table" => {
-              "email" => {:type => :email, :honk_email_skip => true},
-              "name"  => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
-            },
-          })
-          ddo.database_type = :sql_server
-          ddo.globally_kept_columns = %w[something]
-          output = IO::Memory.new
-          ddo.scaffold(database_dump, output)
-          output.rewind
-          output.gets_to_end
-        end
+        string = <<-SQL
+        INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
+        SQL
+        database_dump = IO::Memory.new(string)
+        ddo = Triki.new({
+          "some_table" => {
+            "email" => {:type => :email, :honk_email_skip => true},
+            "name"  => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+          },
+        })
+        ddo.database_type = :sql_server
+        ddo.globally_kept_columns = %w[something]
+        output = IO::Memory.new
+        ddo.scaffold(database_dump, output)
+        output.rewind
+        output_string = output.gets_to_end
 
         it "should scaffold columns that can't be found" do
-          expect(output_string).to match(/"age"\s+=>\s+:keep.+scaffold/)
+          output_string.should match(/"age"\s+=>\s+:keep.+scaffold/)
         end
 
         it "should not scaffold globally_kept_columns" do
-          expect(output_string).not_to match(/"something"\s+=>\s+:keep.+scaffold/)
+          output_string.should_not match(/"something"\s+=>\s+:keep.+scaffold/)
         end
       end
 
       context "when there is an existing config to scaffold and it has extra columns" do
-        let(output_string) do
-          string = <<-SQL
-          INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
-          SQL
-          database_dump = IO::Memory.new(string)
-          ddo = Triki.new({
-            "some_table" => {
-              "email"     => {:type => :email, :honk_email_skip => true},
-              "name"      => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
-              "something" => :keep,
-              "age"       => :keep,
-              "gender"    => {:type => :fixed, :string => "m"},
-            },
-          })
-          ddo.database_type = :sql_server
+        string = <<-SQL
+        INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
+        SQL
+        database_dump = IO::Memory.new(string)
+        ddo = Triki.new({
+          "some_table" => {
+            "email"     => {:type => :email, :honk_email_skip => true},
+            "name"      => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+            "something" => :keep,
+            "age"       => :keep,
+            "gender"    => {:type => :fixed, :string => "m"},
+          },
+        })
+        ddo.database_type = :sql_server
 
-          output = IO::Memory.new
-          ddo.scaffold(database_dump, output)
-          output.rewind
-          output.gets_to_end
-        end
+        output = IO::Memory.new
+        ddo.scaffold(database_dump, output)
+        output.rewind
+        output_string =output.gets_to_end
 
         it "should enumerate extra columns" do
-          expect(output_string).to match(/\#\s*"gender"/)
+          output_string.should match(/\#\s*"gender"/)
         end
       end
 
       context "when there is an existing config to scaffold and it has both missing and extra columns" do
-        let(output_string) do
-          string = <<-SQL
-          INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
-          SQL
-          database_dump = IO::Memory.new(string)
-          ddo = Triki.new({
-            "some_table" => {
-              "email"  => {:type => :email, :honk_email_skip => true},
-              "name"   => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
-              "gender" => {:type => :fixed, :string => "m"},
-            },
-          })
-          ddo.database_type = :sql_server
+        string = <<-SQL
+        INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
+        SQL
+        database_dump = IO::Memory.new(string)
+        ddo = Triki.new({
+          "some_table" => {
+            "email"  => {:type => :email, :honk_email_skip => true},
+            "name"   => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+            "gender" => {:type => :fixed, :string => "m"},
+          },
+        })
+        ddo.database_type = :sql_server
 
-          output = IO::Memory.new
-          ddo.scaffold(database_dump, output)
-          output.rewind
-          output.gets_to_end
-        end
+        output = IO::Memory.new
+        ddo.scaffold(database_dump, output)
+        output.rewind
+        output_string = output.gets_to_end
 
         it "should scaffold columns that can't be found" do
-          expect(output_string).to match(/"age"\s+=>\s+:keep.+scaffold/)
-          expect(output_string).to match(/"something"\s+=>\s+:keep.+scaffold/)
+          output_string.should match(/"age"\s+=>\s+:keep.+scaffold/)
+          output_string.should match(/"something"\s+=>\s+:keep.+scaffold/)
         end
 
         it "should enumerate extra columns" do
-          expect(output_string).to match(/\#\s*"gender"/)
+          output_string.should match(/\#\s*"gender"/)
         end
       end
 
       context "when there is an existing config to scaffold and it is just right" do
-        let(output_string) do
-          string = <<-SQL
-          INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
-          SQL
-          database_dump = IO::Memory.new(string)
-          ddo = Triki.new({
-            "some_table" => {
-              "email" => {
-                :type            => :email,
-                :honk_email_skip => true,
-              },
-              "name" => {
-                :type   => :string,
-                :length => 8,
-                :chars  => Triki::USERNAME_CHARS,
-              },
-              "something" => :keep,
-              "age"       => :keep,
+        string = <<-SQL
+        INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
+        SQL
+        database_dump = IO::Memory.new(string)
+        ddo = Triki.new({
+          "some_table" => {
+            "email" => {
+              :type            => :email,
+              :honk_email_skip => true,
             },
-          })
-          ddo.database_type = :sql_server
+            "name" => {
+              :type   => :string,
+              :length => 8,
+              :chars  => Triki::USERNAME_CHARS,
+            },
+            "something" => :keep,
+            "age"       => :keep,
+          },
+        })
+        ddo.database_type = :sql_server
 
-          output = IO::Memory.new
-          ddo.scaffold(database_dump, output)
-          output.rewind
-          output.gets_to_end
-        end
+        output = IO::Memory.new
+        ddo.scaffold(database_dump, output)
+        output.rewind
+        output_string = output.gets_to_end
 
         it "should say that everything is present and accounted for" do
-          expect(output_string).to match(/^\s*\#.*account/)
-          expect(output_string).not_to contain("scaffold")
-          expect(output_string).not_to contain(%{"some_table"})
+          output_string.should match(/^\s*\#.*account/)
+          output_string.should_not contain("scaffold")
+          output_string.should_not contain(%{"some_table"})
         end
       end
 
       context "when scaffolding a table with no existing config" do
-        let(output_string) do
-          string = <<-SQL
-          INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
-          SQL
-          database_dump = IO::Memory.new(string)
-          ddo = Triki.new({
-            "some_other_table" => {
-              "email"     => {:type => :email, :honk_email_skip => true},
-              "name"      => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
-              "something" => :keep,
-              "age"       => :keep,
-            },
-          })
-          ddo.database_type = :sql_server
-          ddo.globally_kept_columns = %w[age]
+        string = <<-SQL
+        INSERT [dbo].[some_table] ([email], [name], [something], [age]) VALUES ('bob@honk.com','bob', 'some''thin,ge())lse1', 25);
+        SQL
+        database_dump = IO::Memory.new(string)
+        ddo = Triki.new({
+          "some_other_table" => {
+            "email"     => {:type => :email, :honk_email_skip => true},
+            "name"      => {:type => :string, :length => 8, :chars => Triki::USERNAME_CHARS},
+            "something" => :keep,
+            "age"       => :keep,
+          },
+        })
+        ddo.database_type = :sql_server
+        ddo.globally_kept_columns = %w[age]
 
-          output = IO::Memory.new
-          ddo.scaffold(database_dump, output)
-          output.rewind
-          output.gets_to_end
-        end
+        output = IO::Memory.new
+        ddo.scaffold(database_dump, output)
+        output.rewind
+        output_string = output.gets_to_end
 
         it "should scaffold all the columns that are not globally kept" do
-          expect(output_string).to match(/"email"\s+=>\s+:keep.+scaffold/)
-          expect(output_string).to match(/"name"\s+=>\s+:keep.+scaffold/)
-          expect(output_string).to match(/"something"\s+=>\s+:keep.+scaffold/)
+          output_string.should match(/"email"\s+=>\s+:keep.+scaffold/)
+          output_string.should match(/"name"\s+=>\s+:keep.+scaffold/)
+          output_string.should match(/"something"\s+=>\s+:keep.+scaffold/)
         end
 
         it "should not scaffold globally kept columns" do
-          expect(output_string).not_to match(/"age"\s+=>\s+:keep.+scaffold/)
+          output_string.should_not match(/"age"\s+=>\s+:keep.+scaffold/)
         end
       end
     end
