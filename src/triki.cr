@@ -1,12 +1,11 @@
-require "digest/md5"
-require "faker"
-require "walker_method"
 require "log"
 
 # Class for obfuscating MySQL dumps. This can parse mysqldump outputs when using the -c option, which includes
 # column names in the insert statements.
 class Triki
-  property config, globally_kept_columns = Array(String).new, fail_on_unspecified_columns = false, database_type = :mysql, scaffolded_tables
+  property config, globally_kept_columns = Array(String).new, fail_on_unspecified_columns = false, database_type = :mysql, scaffolded_tables, faker
+
+  @faker = Faker
 
   NUMBER_CHARS   = "1234567890"
   USERNAME_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_" + NUMBER_CHARS
@@ -131,7 +130,7 @@ class Triki
       check_for_table_columns_not_in_definition(table_name, columns) if fail_on_unspecified_columns?
       # Note: Remember to SQL escape strings in what you pass back.
       reassembling_each_insert(line, table_name, columns, ignore) do |row|
-        ConfigApplicator.apply_table_config(row, table_config, columns)
+        ConfigApplicator.apply_table_config(row: row, table_config: table_config, columns: columns, faker: @faker)
       end
     end
   end
