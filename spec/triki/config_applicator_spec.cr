@@ -3,6 +3,34 @@ require "log/spec"
 
 alias RowAsHash = Triki::ConfigApplicator::RowAsHash
 
+class MyFaker < Triki::Faker
+  def self.city
+    "Foo O'City"
+  end
+
+  def self.name
+    "Foo O'Reilly"
+  end
+
+  def self.first_name
+    "O'Foo"
+  end
+
+  def self.last_name
+    "O'Reilly"
+  end
+
+  def self.lorem
+    %w[Foo bar O'Thingy]
+  end
+end
+
+class MyDictionary < Triki::DictionaryInterface
+  def self.random_sentences(num : Int32)
+    "My first sentence. This is the second."
+  end
+end
+
 describe Triki::ConfigApplicator do
   describe ".apply_table_config" do
     it "should work on email addresses" do
@@ -232,37 +260,14 @@ describe Triki::ConfigApplicator do
     end
 
     describe "when faker generates values with quotes in them" do
-      # mock Faker::Address do
-      #   stub def city
-      #     "O'ReillyTown"
-      #   end
-      # end
-
-      # mock Faker::Name do
-      #   stub def name
-      #     "Foo O'Reilly"
-      #   end
-
-      #   stub def first_name
-      #     "O'Foo"
-      #   end
-
-      #   stub def last_name
-      #     "O'Reilly"
-      #   end
-      # end
-
-      # mock Faker::Lorem do
-      #   stub def sentences
-      #     %w[Foo bar O'Thingy]
-      #   end
-      # end
-
-      pending "should remove single quotes from the value" do
-        new_row = Triki::ConfigApplicator.apply_table_config(["address", "city", "first", "last", "fullname", "some text"],
-          Triki::ConfigTableHash{"a" => :address, "b" => :city, "c" => :first_name, "d" => :last_name, "e" => :name, "f" => :lorem},
-          ["a", "b", "c", "d", "e", "f"])
-        new_row.each { |value| value.as(String).should contain("'") }
+      it "should remove single quotes from the value" do
+        new_row = Triki::ConfigApplicator.apply_table_config(
+          row: ["address", "city", "first", "last", "fullname", "some text"],
+          table_config: Triki::ConfigTableHash{"a" => :address, "b" => :city, "c" => :first_name, "d" => :last_name, "e" => :name, "f" => :lorem},
+          columns:["a", "b", "c", "d", "e", "f"],
+          faker: MyFaker
+        )
+        new_row.each { |value| value.as(String).should_not contain("'") }
       end
     end
   end
@@ -274,28 +279,23 @@ describe Triki::ConfigApplicator do
   end
 
   describe ".random_english_sentences" do
-    # mock File do
-    #   stub def read
-    #     "hello 2"
-    #   end
-    # end
-
     it "should only load file data once" do
-      Triki::ConfigApplicator.random_english_sentences(1)
-      Triki::ConfigApplicator.random_english_sentences(1)
+      Triki::EnglishDictionary.random_sentences(1)
+      Triki::EnglishDictionary.random_sentences(1)
     end
 
     it "should make random sentences" do
-      sentences = Triki::ConfigApplicator.random_english_sentences(2)
+      text = Triki::EnglishDictionary.random_sentences(2)
 
-      sentences.should match(/^([\w|']{1,}( [\w|']{1,})+\.\s*){2}$/)
+      word = /(?:[\w|']{1,})+/
+      sentence = /(?:#{word}\s)+#{word}\./
+      two_sentences = /^(?:#{sentence}\s*){2}$/
 
-      regex_match = sentences.match(/^([\w|']{1,}( [\w|']{1,})+\.\s*){2}$/)
+      text.should match(two_sentences)
 
-      regex_match.should_not be_nil
+      sentences = text.scan(sentence).map(&.[0])
 
-      regex_match.as(Regex::MatchData)[1].should eq(regex_match.as(Regex::MatchData)[1].capitalize)
-      regex_match.as(Regex::MatchData)[2].should eq(regex_match.as(Regex::MatchData)[2].capitalize)
+      sentences[0].should_not eq(sentences[1])
     end
   end
 end

@@ -1,3 +1,5 @@
+require "digest/md5"
+
 class Triki
   module ConfigApplicator
     alias RowAsHash = Hash(String, RowContent)
@@ -10,7 +12,7 @@ class Triki
     alias StringProc = Proc(String)
 
     # ameba:disable Metrics/CyclomaticComplexity
-    def self.apply_table_config(row : Array(String?), table_config : Triki::ConfigTableHash, columns : Columns)
+    def self.apply_table_config(row : Array(String?), table_config : Triki::ConfigTableHash, columns : Columns, faker = Faker, dictionary = EnglishDictionary)
       return row unless table_config.is_a?(Hash)
 
       row_hash = row_as_hash(row, columns)
@@ -53,41 +55,41 @@ class Triki
         my_row[index] = case definition[:type]
                         when :email
                           md5 = Digest::MD5.hexdigest(rand.to_s)[0...5]
-                          clean_quotes("#{Faker::Internet.email}.#{md5}.example.com")
+                          clean_quotes("#{faker.email}.#{md5}.example.com")
                         when :string
                           random_string(length || 30, chars.as(String | Nil) || SENSIBLE_CHARS) if length.is_a?(Int32)
                         when :lorem
-                          clean_bad_whitespace(clean_quotes(Faker::Lorem.sentences(number).join(".  ")))
+                          clean_bad_whitespace(clean_quotes(faker.lorem(number).join(".  ")))
                         when :like_english
-                          clean_quotes random_english_sentences(number)
+                          clean_quotes(dictionary.random_sentences(number))
                         when :name
-                          clean_quotes(Faker::Name.name)
+                          clean_quotes(faker.name)
                         when :first_name
-                          clean_quotes(Faker::Name.first_name)
+                          clean_quotes(faker.first_name)
                         when :last_name
-                          clean_quotes(Faker::Name.last_name)
+                          clean_quotes(faker.last_name)
                         when :address
-                          clean_quotes("#{Faker::Address.street_address}\\n#{Faker::Address.city}, #{Faker::Address.state_abbr} #{Faker::Address.zip_code}")
+                          clean_quotes("#{faker.street_address}\\n#{faker.city}, #{faker.state_abbr} #{faker.zip_code}")
                         when :street_address
-                          clean_bad_whitespace(clean_quotes(Faker::Address.street_address))
+                          clean_bad_whitespace(clean_quotes(faker.street_address))
                         when :secondary_address
-                          clean_bad_whitespace(clean_quotes(Faker::Address.secondary_address))
+                          clean_bad_whitespace(clean_quotes(faker.secondary_address))
                         when :city
-                          clean_quotes(Faker::Address.city)
+                          clean_quotes(faker.city)
                         when :state
-                          clean_quotes Faker::Address.state_abbr
+                          clean_quotes(faker.state_abbr)
                         when :zip_code
-                          Faker::Address.zip_code
+                          faker.zip_code
                         when :phone
-                          clean_quotes Faker::PhoneNumber.phone_number
+                          clean_quotes(faker.phone_number)
                         when :company
-                          clean_bad_whitespace(clean_quotes(Faker::Company.name))
+                          clean_bad_whitespace(clean_quotes(faker.company))
                         when :ipv4
-                          Faker::Internet.ip_v4_address
+                          faker.ip_v4_address
                         when :ipv6
-                          Faker::Internet.ip_v6_address
+                          faker.ip_v6_address
                         when :url
-                          clean_bad_whitespace(Faker::Internet.url)
+                          clean_bad_whitespace(faker.url)
                         when :integer
                           random_integer(between).to_s
                         when :fixed
@@ -159,30 +161,6 @@ class Triki
         random_string += chars[(rand * chars.size).to_i]
       end
       random_string
-    end
-
-    def self.walker_method
-      @@walker_method ||= begin
-        words = Array(String).new
-        counts = Array(Int32).new
-        File.read(File.expand_path(File.join(__DIR__, "data", "en_50K.txt"))).each_line do |line|
-          word, count = line.split(/\s+/)
-          words << word
-          counts << count.to_i
-        end
-        WalkerMethod.new(words, counts)
-      end
-    end
-
-    def self.random_english_sentences(num : Int32)
-      sentences = Array(String).new
-      num.times do
-        words = Array(String).new
-        (3 + rand * 5).to_i.times { words << walker_method.random }
-        sentence = words.join(" ") + "."
-        sentences << sentence.capitalize
-      end
-      sentences.join(" ")
     end
 
     def self.clean_quotes(value)
