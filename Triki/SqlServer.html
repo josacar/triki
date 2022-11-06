@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="generator" content="Crystal Docs 1.5.0">
+<meta name="crystal_docs.project_version" content="master">
+<meta name="crystal_docs.project_name" content="triki">
+
+
+
+<link href="../css/style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="../js/doc.js"></script>
+
+  <meta name="repository-name" content="triki">
+  <title>Triki::SqlServer - triki master</title>
+  <script type="text/javascript">
+    CrystalDocs.base_path = "../";
+  </script>
+</head>
+<body>
+
+<svg class="hidden">
+  <symbol id="octicon-link" viewBox="0 0 16 16">
+    <path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path>
+  </symbol>
+</svg>
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="search-box">
+      <input type="search" class="search-input" placeholder="Search..." spellcheck="false" aria-label="Search">
+    </div>
+
+    <div class="project-summary">
+      <h1 class="project-name">
+        <a href="../index.html">
+          triki
+        </a>
+      </h1>
+
+      <span class="project-version">
+        master
+      </span>
+    </div>
+  </div>
+
+  <div class="search-results hidden">
+    <ul class="search-list"></ul>
+  </div>
+
+  <div class="types-list">
+    <ul>
+  
+  <li class="parent open current" data-id="triki/Triki" data-name="triki">
+      <a href="../Triki.html">Triki</a>
+      
+        <ul>
+  
+  <li class=" " data-id="triki/Triki/Between" data-name="triki::between">
+      <a href="../Triki/Between.html">Between</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ColumnAction" data-name="triki::columnaction">
+      <a href="../Triki/ColumnAction.html">ColumnAction</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ColumnList" data-name="triki::columnlist">
+      <a href="../Triki/ColumnList.html">ColumnList</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ColumnName" data-name="triki::columnname">
+      <a href="../Triki/ColumnName.html">ColumnName</a>
+      
+    </li>
+  
+  <li class="parent " data-id="triki/Triki/ConfigApplicator" data-name="triki::configapplicator">
+      <a href="../Triki/ConfigApplicator.html">ConfigApplicator</a>
+      
+        <ul>
+  
+  <li class=" " data-id="triki/Triki/ConfigApplicator/BoolProc" data-name="triki::configapplicator::boolproc">
+      <a href="../Triki/ConfigApplicator/BoolProc.html">BoolProc</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigApplicator/Columns" data-name="triki::configapplicator::columns">
+      <a href="../Triki/ConfigApplicator/Columns.html">Columns</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigApplicator/IntRange" data-name="triki::configapplicator::intrange">
+      <a href="../Triki/ConfigApplicator/IntRange.html">IntRange</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigApplicator/Row" data-name="triki::configapplicator::row">
+      <a href="../Triki/ConfigApplicator/Row.html">Row</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigApplicator/RowAsHash" data-name="triki::configapplicator::rowashash">
+      <a href="../Triki/ConfigApplicator/RowAsHash.html">RowAsHash</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigApplicator/RowContent" data-name="triki::configapplicator::rowcontent">
+      <a href="../Triki/ConfigApplicator/RowContent.html">RowContent</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigApplicator/StringProc" data-name="triki::configapplicator::stringproc">
+      <a href="../Triki/ConfigApplicator/StringProc.html">StringProc</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigColumn" data-name="triki::configcolumn">
+      <a href="../Triki/ConfigColumn.html">ConfigColumn</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigColumnHash" data-name="triki::configcolumnhash">
+      <a href="../Triki/ConfigColumnHash.html">ConfigColumnHash</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigHash" data-name="triki::confighash">
+      <a href="../Triki/ConfigHash.html">ConfigHash</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigParser" data-name="triki::configparser">
+      <a href="../Triki/ConfigParser.html">ConfigParser</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigScaffoldGenerator" data-name="triki::configscaffoldgenerator">
+      <a href="../Triki/ConfigScaffoldGenerator.html">ConfigScaffoldGenerator</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigTable" data-name="triki::configtable">
+      <a href="../Triki/ConfigTable.html">ConfigTable</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigTableHash" data-name="triki::configtablehash">
+      <a href="../Triki/ConfigTableHash.html">ConfigTableHash</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/CopyStatementParser" data-name="triki::copystatementparser">
+      <a href="../Triki/CopyStatementParser.html">CopyStatementParser</a>
+      
+    </li>
+  
+  <li class="parent " data-id="triki/Triki/DictionaryInterface" data-name="triki::dictionaryinterface">
+      <a href="../Triki/DictionaryInterface.html">DictionaryInterface</a>
+      
+        <ul>
+  
+  <li class=" " data-id="triki/Triki/DictionaryInterface/ClassMethods" data-name="triki::dictionaryinterface::classmethods">
+      <a href="../Triki/DictionaryInterface/ClassMethods.html">ClassMethods</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/EnglishDictionary" data-name="triki::englishdictionary">
+      <a href="../Triki/EnglishDictionary.html">EnglishDictionary</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/Faker" data-name="triki::faker">
+      <a href="../Triki/Faker.html">Faker</a>
+      
+    </li>
+  
+  <li class="parent " data-id="triki/Triki/FakerInterface" data-name="triki::fakerinterface">
+      <a href="../Triki/FakerInterface.html">FakerInterface</a>
+      
+        <ul>
+  
+  <li class=" " data-id="triki/Triki/FakerInterface/ClassMethods" data-name="triki::fakerinterface::classmethods">
+      <a href="../Triki/FakerInterface/ClassMethods.html">ClassMethods</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/InsertStatementParser" data-name="triki::insertstatementparser">
+      <a href="../Triki/InsertStatementParser.html">InsertStatementParser</a>
+      
+    </li>
+  
+  <li class="parent " data-id="triki/Triki/Mysql" data-name="triki::mysql">
+      <a href="../Triki/Mysql.html">Mysql</a>
+      
+        <ul>
+  
+  <li class=" " data-id="triki/Triki/Mysql/Field" data-name="triki::mysql::field">
+      <a href="../Triki/Mysql/Field.html">Field</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/Postgres" data-name="triki::postgres">
+      <a href="../Triki/Postgres.html">Postgres</a>
+      
+    </li>
+  
+  <li class=" current" data-id="triki/Triki/SqlServer" data-name="triki::sqlserver">
+      <a href="../Triki/SqlServer.html">SqlServer</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/TableName" data-name="triki::tablename">
+      <a href="../Triki/TableName.html">TableName</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/TruncateOrKeepTable" data-name="triki::truncateorkeeptable">
+      <a href="../Triki/TruncateOrKeepTable.html">TruncateOrKeepTable</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+</ul>
+
+  </div>
+</div>
+
+
+<div class="main-content">
+<h1 class="type-name">
+
+  <span class="kind">struct</span> Triki::SqlServer
+
+</h1>
+
+
+  <ul class="superclass-hierarchy"><li class="superclass"><a href="../Triki/SqlServer.html">Triki::SqlServer</a></li><li class="superclass">Struct</li><li class="superclass">Value</li><li class="superclass">Object</li></ul>
+
+
+
+
+
+
+
+
+  <h2>
+    <a id="included-modules" class="anchor" href="#included-modules">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Included Modules
+  </h2>
+  <ul class="other-types-list">
+    
+      <li class="other-type"><a href="../Triki/ConfigScaffoldGenerator.html">Triki::ConfigScaffoldGenerator</a></li>
+    
+      <li class="other-type"><a href="../Triki/InsertStatementParser.html">Triki::InsertStatementParser</a></li>
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+  <h2>
+    <a id="defined-in" class="anchor" href="#defined-in">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Defined in:
+  </h2>
+  
+    
+      <a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/sql_server.cr#L2" target="_blank">
+        triki/sql_server.cr
+      </a>
+    
+    <br/>
+  
+
+
+
+
+
+  <h2>
+    <a id="constructors" class="anchor" href="#constructors">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Constructors
+  </h2>
+  <ul class="list-summary">
+    
+      <li class="entry-summary">
+        <a href="#new-class-method" class="signature"><strong>.new</strong></a>
+        
+      </li>
+    
+  </ul>
+
+
+
+
+
+  <h2>
+    <a id="instance-method-summary" class="anchor" href="#instance-method-summary">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Instance Method Summary
+  </h2>
+  <ul class="list-summary">
+    
+      <li class="entry-summary">
+        <a href="#initialize-instance-method" class="signature"><strong>#initialize</strong></a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#make_insert_statement%28table_name%2Ccolumn_names%2Cvalues%2Cignore%3Dnil%29-instance-method" class="signature"><strong>#make_insert_statement</strong>(table_name, column_names, values, ignore = <span class="n">nil</span>)</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#make_valid_value_string%28value%29-instance-method" class="signature"><strong>#make_valid_value_string</strong>(value)</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#parse_insert_statement%28line%29-instance-method" class="signature"><strong>#parse_insert_statement</strong>(line)</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#rows_to_be_inserted%28line%29-instance-method" class="signature"><strong>#rows_to_be_inserted</strong>(line)</a>
+        
+      </li>
+    
+  </ul>
+
+
+
+
+
+<div class="methods-inherited">
+  
+    
+
+  <h3>Instance methods inherited from module <code><a href="../Triki/ConfigScaffoldGenerator.html">Triki::ConfigScaffoldGenerator</a></code></h3>
+  
+  
+    <a href="../Triki/ConfigScaffoldGenerator.html#config_table_close%28table_name%29-instance-method" class="tooltip">
+      <span>config_table_close(table_name)</span>
+    config_table_close</a>, 
+    
+  
+    <a href="../Triki/ConfigScaffoldGenerator.html#config_table_open%28table_name%29-instance-method" class="tooltip">
+      <span>config_table_open(table_name)</span>
+    config_table_open</a>, 
+    
+  
+    <a href="../Triki/ConfigScaffoldGenerator.html#emit_scaffold%28table_name%2Cexisting_config%2Cextra_columns%2Ccolumns_to_scaffold%2Coutput_io%29-instance-method" class="tooltip">
+      <span>emit_scaffold(table_name, existing_config, extra_columns, columns_to_scaffold, output_io)</span>
+    emit_scaffold</a>, 
+    
+  
+    <a href="../Triki/ConfigScaffoldGenerator.html#formatted_line%28column%2Cdefinition%2Ccomment%3Dnil%29-instance-method" class="tooltip">
+      <span>formatted_line(column, definition, comment = <span class="n">nil</span>)</span>
+    formatted_line</a>, 
+    
+  
+    <a href="../Triki/ConfigScaffoldGenerator.html#generate_config%28obfuscator%2Cconfig%2Cinput_io%2Coutput_io%29-instance-method" class="tooltip">
+      <span>generate_config(obfuscator, config, input_io, output_io)</span>
+    generate_config</a>
+    
+  
+
+
+    
+
+
+    
+
+
+  
+    
+
+  <h3>Instance methods inherited from module <code><a href="../Triki/InsertStatementParser.html">Triki::InsertStatementParser</a></code></h3>
+  
+  
+    <a href="../Triki/InsertStatementParser.html#parse%28obfuscator%2Cconfig%2Cinput_io%2Coutput_io%29-instance-method" class="tooltip">
+      <span>parse(obfuscator, config, input_io, output_io)</span>
+    parse</a>
+    
+  
+
+
+    
+
+
+    
+
+
+  
+    
+
+
+    
+
+
+    
+
+
+  
+    
+
+
+    
+
+
+    
+
+
+  
+    
+
+
+    
+
+
+    
+
+
+  
+</div>
+
+
+  <h2>
+    <a id="constructor-detail" class="anchor" href="#constructor-detail">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Constructor Detail
+  </h2>
+  
+    <div class="entry-detail" id="new-class-method">
+      <div class="signature">
+        
+        def self.<strong>new</strong>
+
+        <a class="method-permalink" href="#new-class-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/sql_server.cr#L2" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+
+
+
+
+
+  <h2>
+    <a id="instance-method-detail" class="anchor" href="#instance-method-detail">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Instance Method Detail
+  </h2>
+  
+    <div class="entry-detail" id="initialize-instance-method">
+      <div class="signature">
+        
+        def <strong>initialize</strong>
+
+        <a class="method-permalink" href="#initialize-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/sql_server.cr#L2" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="make_insert_statement(table_name,column_names,values,ignore=nil)-instance-method">
+      <div class="signature">
+        
+        def <strong>make_insert_statement</strong>(table_name, column_names, values, ignore = <span class="n">nil</span>)
+
+        <a class="method-permalink" href="#make_insert_statement%28table_name%2Ccolumn_names%2Cvalues%2Cignore%3Dnil%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/sql_server.cr#L31" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="make_valid_value_string(value)-instance-method">
+      <div class="signature">
+        
+        def <strong>make_valid_value_string</strong>(value)
+
+        <a class="method-permalink" href="#make_valid_value_string%28value%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/sql_server.cr#L21" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="parse_insert_statement(line)-instance-method">
+      <div class="signature">
+        
+        def <strong>parse_insert_statement</strong>(line)
+
+        <a class="method-permalink" href="#parse_insert_statement%28line%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/sql_server.cr#L6" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="rows_to_be_inserted(line)-instance-method">
+      <div class="signature">
+        
+        def <strong>rows_to_be_inserted</strong>(line)
+
+        <a class="method-permalink" href="#rows_to_be_inserted%28line%29-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/sql_server.cr#L15" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+
+
+
+
+</div>
+
+</body>
+</html>

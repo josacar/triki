@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="generator" content="Crystal Docs 1.5.0">
+<meta name="crystal_docs.project_version" content="master">
+<meta name="crystal_docs.project_name" content="triki">
+
+
+
+<link href="../css/style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="../js/doc.js"></script>
+
+  <meta name="repository-name" content="triki">
+  <title>Triki::Faker - triki master</title>
+  <script type="text/javascript">
+    CrystalDocs.base_path = "../";
+  </script>
+</head>
+<body>
+
+<svg class="hidden">
+  <symbol id="octicon-link" viewBox="0 0 16 16">
+    <path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path>
+  </symbol>
+</svg>
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="search-box">
+      <input type="search" class="search-input" placeholder="Search..." spellcheck="false" aria-label="Search">
+    </div>
+
+    <div class="project-summary">
+      <h1 class="project-name">
+        <a href="../index.html">
+          triki
+        </a>
+      </h1>
+
+      <span class="project-version">
+        master
+      </span>
+    </div>
+  </div>
+
+  <div class="search-results hidden">
+    <ul class="search-list"></ul>
+  </div>
+
+  <div class="types-list">
+    <ul>
+  
+  <li class="parent open current" data-id="triki/Triki" data-name="triki">
+      <a href="../Triki.html">Triki</a>
+      
+        <ul>
+  
+  <li class=" " data-id="triki/Triki/Between" data-name="triki::between">
+      <a href="../Triki/Between.html">Between</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ColumnAction" data-name="triki::columnaction">
+      <a href="../Triki/ColumnAction.html">ColumnAction</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ColumnList" data-name="triki::columnlist">
+      <a href="../Triki/ColumnList.html">ColumnList</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ColumnName" data-name="triki::columnname">
+      <a href="../Triki/ColumnName.html">ColumnName</a>
+      
+    </li>
+  
+  <li class="parent " data-id="triki/Triki/ConfigApplicator" data-name="triki::configapplicator">
+      <a href="../Triki/ConfigApplicator.html">ConfigApplicator</a>
+      
+        <ul>
+  
+  <li class=" " data-id="triki/Triki/ConfigApplicator/BoolProc" data-name="triki::configapplicator::boolproc">
+      <a href="../Triki/ConfigApplicator/BoolProc.html">BoolProc</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigApplicator/Columns" data-name="triki::configapplicator::columns">
+      <a href="../Triki/ConfigApplicator/Columns.html">Columns</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigApplicator/IntRange" data-name="triki::configapplicator::intrange">
+      <a href="../Triki/ConfigApplicator/IntRange.html">IntRange</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigApplicator/Row" data-name="triki::configapplicator::row">
+      <a href="../Triki/ConfigApplicator/Row.html">Row</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigApplicator/RowAsHash" data-name="triki::configapplicator::rowashash">
+      <a href="../Triki/ConfigApplicator/RowAsHash.html">RowAsHash</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigApplicator/RowContent" data-name="triki::configapplicator::rowcontent">
+      <a href="../Triki/ConfigApplicator/RowContent.html">RowContent</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigApplicator/StringProc" data-name="triki::configapplicator::stringproc">
+      <a href="../Triki/ConfigApplicator/StringProc.html">StringProc</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigColumn" data-name="triki::configcolumn">
+      <a href="../Triki/ConfigColumn.html">ConfigColumn</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigColumnHash" data-name="triki::configcolumnhash">
+      <a href="../Triki/ConfigColumnHash.html">ConfigColumnHash</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigHash" data-name="triki::confighash">
+      <a href="../Triki/ConfigHash.html">ConfigHash</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigParser" data-name="triki::configparser">
+      <a href="../Triki/ConfigParser.html">ConfigParser</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigScaffoldGenerator" data-name="triki::configscaffoldgenerator">
+      <a href="../Triki/ConfigScaffoldGenerator.html">ConfigScaffoldGenerator</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigTable" data-name="triki::configtable">
+      <a href="../Triki/ConfigTable.html">ConfigTable</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/ConfigTableHash" data-name="triki::configtablehash">
+      <a href="../Triki/ConfigTableHash.html">ConfigTableHash</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/CopyStatementParser" data-name="triki::copystatementparser">
+      <a href="../Triki/CopyStatementParser.html">CopyStatementParser</a>
+      
+    </li>
+  
+  <li class="parent " data-id="triki/Triki/DictionaryInterface" data-name="triki::dictionaryinterface">
+      <a href="../Triki/DictionaryInterface.html">DictionaryInterface</a>
+      
+        <ul>
+  
+  <li class=" " data-id="triki/Triki/DictionaryInterface/ClassMethods" data-name="triki::dictionaryinterface::classmethods">
+      <a href="../Triki/DictionaryInterface/ClassMethods.html">ClassMethods</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/EnglishDictionary" data-name="triki::englishdictionary">
+      <a href="../Triki/EnglishDictionary.html">EnglishDictionary</a>
+      
+    </li>
+  
+  <li class=" current" data-id="triki/Triki/Faker" data-name="triki::faker">
+      <a href="../Triki/Faker.html">Faker</a>
+      
+    </li>
+  
+  <li class="parent " data-id="triki/Triki/FakerInterface" data-name="triki::fakerinterface">
+      <a href="../Triki/FakerInterface.html">FakerInterface</a>
+      
+        <ul>
+  
+  <li class=" " data-id="triki/Triki/FakerInterface/ClassMethods" data-name="triki::fakerinterface::classmethods">
+      <a href="../Triki/FakerInterface/ClassMethods.html">ClassMethods</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/InsertStatementParser" data-name="triki::insertstatementparser">
+      <a href="../Triki/InsertStatementParser.html">InsertStatementParser</a>
+      
+    </li>
+  
+  <li class="parent " data-id="triki/Triki/Mysql" data-name="triki::mysql">
+      <a href="../Triki/Mysql.html">Mysql</a>
+      
+        <ul>
+  
+  <li class=" " data-id="triki/Triki/Mysql/Field" data-name="triki::mysql::field">
+      <a href="../Triki/Mysql/Field.html">Field</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/Postgres" data-name="triki::postgres">
+      <a href="../Triki/Postgres.html">Postgres</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/SqlServer" data-name="triki::sqlserver">
+      <a href="../Triki/SqlServer.html">SqlServer</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/TableName" data-name="triki::tablename">
+      <a href="../Triki/TableName.html">TableName</a>
+      
+    </li>
+  
+  <li class=" " data-id="triki/Triki/TruncateOrKeepTable" data-name="triki::truncateorkeeptable">
+      <a href="../Triki/TruncateOrKeepTable.html">TruncateOrKeepTable</a>
+      
+    </li>
+  
+</ul>
+
+      
+    </li>
+  
+</ul>
+
+  </div>
+</div>
+
+
+<div class="main-content">
+<h1 class="type-name">
+
+  <span class="kind">class</span> Triki::Faker
+
+</h1>
+
+
+  <ul class="superclass-hierarchy"><li class="superclass"><a href="../Triki/Faker.html">Triki::Faker</a></li><li class="superclass"><a href="../Triki/FakerInterface.html">Triki::FakerInterface</a></li><li class="superclass">Reference</li><li class="superclass">Object</li></ul>
+
+
+
+
+
+
+
+
+
+
+  <h2>
+    <a id="extended-modules" class="anchor" href="#extended-modules">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Extended Modules
+  </h2>
+  <ul class="other-types-list">
+    
+      <li class="other-type"><a href="../Triki/FakerInterface/ClassMethods.html">Triki::FakerInterface::ClassMethods</a></li>
+    
+  </ul>
+
+
+
+
+
+
+
+
+  <h2>
+    <a id="defined-in" class="anchor" href="#defined-in">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Defined in:
+  </h2>
+  
+    
+      <a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/faker.cr#L27" target="_blank">
+        triki/faker.cr
+      </a>
+    
+    <br/>
+  
+
+
+
+
+
+
+
+  <h2>
+    <a id="class-method-summary" class="anchor" href="#class-method-summary">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Class Method Summary
+  </h2>
+  <ul class="list-summary">
+    
+      <li class="entry-summary">
+        <a href="#city-class-method" class="signature"><strong>.city</strong></a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#company-class-method" class="signature"><strong>.company</strong></a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#email-class-method" class="signature"><strong>.email</strong></a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#first_name-class-method" class="signature"><strong>.first_name</strong></a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#ip_v4_address-class-method" class="signature"><strong>.ip_v4_address</strong></a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#ip_v6_address-class-method" class="signature"><strong>.ip_v6_address</strong></a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#last_name-class-method" class="signature"><strong>.last_name</strong></a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#lorem%28number%29-class-method" class="signature"><strong>.lorem</strong>(number)</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#name-class-method" class="signature"><strong>.name</strong></a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#phone_number-class-method" class="signature"><strong>.phone_number</strong></a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#secondary_address-class-method" class="signature"><strong>.secondary_address</strong></a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#state_abbr-class-method" class="signature"><strong>.state_abbr</strong></a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#street_address-class-method" class="signature"><strong>.street_address</strong></a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#url-class-method" class="signature"><strong>.url</strong></a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#zip_code-class-method" class="signature"><strong>.zip_code</strong></a>
+        
+      </li>
+    
+  </ul>
+
+
+
+
+
+  <h2>
+    <a id="macro-summary" class="anchor" href="#macro-summary">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Macro Summary
+  </h2>
+  <ul class="list-summary">
+    
+      <li class="entry-summary">
+        <a href="#define_addresses%28addresses%29-macro" class="signature"><strong>define_addresses</strong>(addresses)</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#define_ip_addresses%28addresses%29-macro" class="signature"><strong>define_ip_addresses</strong>(addresses)</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#define_names%28names%29-macro" class="signature"><strong>define_names</strong>(names)</a>
+        
+      </li>
+    
+  </ul>
+
+
+
+<div class="methods-inherited">
+  
+    
+
+
+    
+
+
+    
+
+
+  
+    
+
+
+    
+
+
+    
+
+
+  
+    
+
+
+    
+
+
+    
+
+
+  
+</div>
+
+
+
+
+  <h2>
+    <a id="class-method-detail" class="anchor" href="#class-method-detail">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Class Method Detail
+  </h2>
+  
+    <div class="entry-detail" id="city-class-method">
+      <div class="signature">
+        
+        def self.<strong>city</strong>
+
+        <a class="method-permalink" href="#city-class-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/faker.cr#L54" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="company-class-method">
+      <div class="signature">
+        
+        def self.<strong>company</strong>
+
+        <a class="method-permalink" href="#company-class-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/faker.cr#L60" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="email-class-method">
+      <div class="signature">
+        
+        def self.<strong>email</strong>
+
+        <a class="method-permalink" href="#email-class-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/faker.cr#L28" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="first_name-class-method">
+      <div class="signature">
+        
+        def self.<strong>first_name</strong>
+
+        <a class="method-permalink" href="#first_name-class-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/faker.cr#L44" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="ip_v4_address-class-method">
+      <div class="signature">
+        
+        def self.<strong>ip_v4_address</strong>
+
+        <a class="method-permalink" href="#ip_v4_address-class-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/faker.cr#L72" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="ip_v6_address-class-method">
+      <div class="signature">
+        
+        def self.<strong>ip_v6_address</strong>
+
+        <a class="method-permalink" href="#ip_v6_address-class-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/faker.cr#L72" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="last_name-class-method">
+      <div class="signature">
+        
+        def self.<strong>last_name</strong>
+
+        <a class="method-permalink" href="#last_name-class-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/faker.cr#L44" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="lorem(number)-class-method">
+      <div class="signature">
+        
+        def self.<strong>lorem</strong>(number)
+
+        <a class="method-permalink" href="#lorem%28number%29-class-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/faker.cr#L32" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="name-class-method">
+      <div class="signature">
+        
+        def self.<strong>name</strong>
+
+        <a class="method-permalink" href="#name-class-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/faker.cr#L44" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="phone_number-class-method">
+      <div class="signature">
+        
+        def self.<strong>phone_number</strong>
+
+        <a class="method-permalink" href="#phone_number-class-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/faker.cr#L56" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="secondary_address-class-method">
+      <div class="signature">
+        
+        def self.<strong>secondary_address</strong>
+
+        <a class="method-permalink" href="#secondary_address-class-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/faker.cr#L54" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="state_abbr-class-method">
+      <div class="signature">
+        
+        def self.<strong>state_abbr</strong>
+
+        <a class="method-permalink" href="#state_abbr-class-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/faker.cr#L54" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="street_address-class-method">
+      <div class="signature">
+        
+        def self.<strong>street_address</strong>
+
+        <a class="method-permalink" href="#street_address-class-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/faker.cr#L54" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="url-class-method">
+      <div class="signature">
+        
+        def self.<strong>url</strong>
+
+        <a class="method-permalink" href="#url-class-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/faker.cr#L74" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="zip_code-class-method">
+      <div class="signature">
+        
+        def self.<strong>zip_code</strong>
+
+        <a class="method-permalink" href="#zip_code-class-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/faker.cr#L54" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+
+
+
+
+
+  <h2>
+    <a id="macro-detail" class="anchor" href="#macro-detail">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>
+    Macro Detail
+  </h2>
+  
+    <div class="entry-detail" id="define_addresses(addresses)-macro">
+      <div class="signature">
+        
+        macro <strong>define_addresses</strong>(addresses)
+
+        <a class="method-permalink" href="#define_addresses%28addresses%29-macro">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/faker.cr#L46" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="define_ip_addresses(addresses)-macro">
+      <div class="signature">
+        
+        macro <strong>define_ip_addresses</strong>(addresses)
+
+        <a class="method-permalink" href="#define_ip_addresses%28addresses%29-macro">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/faker.cr#L64" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="define_names(names)-macro">
+      <div class="signature">
+        
+        macro <strong>define_names</strong>(names)
+
+        <a class="method-permalink" href="#define_names%28names%29-macro">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/josacar/triki/blob/4613c06da9877a6b6c955c6216fd60ab29e786ca/src/triki/faker.cr#L36" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+
+
+</div>
+
+</body>
+</html>
