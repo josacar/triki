@@ -30,7 +30,7 @@ jobs:
         id: pages
         uses: actions/configure-pages@v2
       - name: Build docs
-        run: crystal docs
+        run: crystal docs --project-version="$(shards version)"
       - name: Upload artifact
         # Automatically uploads an artifact from the './_site' directory by default
         uses: actions/upload-pages-artifact@v1
