@@ -30,10 +30,12 @@ jobs:
         id: pages
         uses: actions/configure-pages@v2
       - name: Build docs
-        run: crystal docs --output "${{ steps.pages.outputs.base_path }}"
+        run: crystal docs
       - name: Upload artifact
         # Automatically uploads an artifact from the './_site' directory by default
         uses: actions/upload-pages-artifact@v1
+        with:
+          path: 'docs'
   deploy:
     environment:
       name: github-pages
