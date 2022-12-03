@@ -1,5 +1,5 @@
 name: triki
-version: 0.2.4
+version: 0.2.5
 
 dependencies:
   walker_method:
@@ -22,3 +22,5 @@ crystal: "~> 1.0, >= 1.0.0"
 
 description: |
   Mysql, PostgreSQL and SQL dump obfuscator aka anonimizer
+
+documentation: https://josacar.github.io/triki/
