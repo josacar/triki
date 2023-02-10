@@ -2,14 +2,8 @@ require "digest/md5"
 
 class Triki
   module ConfigApplicator
-    alias RowAsHash = Hash(String, RowContent)
-    alias RowContent = String | Int32 | Nil
-    alias Row = Array(RowContent)
-    alias Columns = Array(String)
-    alias IntRange = Range(Int32, Int32)
-
-    alias BoolProc = Proc(RowAsHash, Bool)
-    alias StringProc = Proc(String)
+    alias RowAsHash = Triki::RowAsHash
+    alias RowContent = Triki::RowContent
 
     # ameba:disable Metrics/CyclomaticComplexity
     def self.apply_table_config(row : Array(String?), table_config : Triki::ConfigTableHash, columns : Columns, faker = Faker, dictionary = EnglishDictionary)
@@ -99,7 +93,7 @@ class Triki
                             string = definition[:string]
 
                             if string.is_a?(Proc)
-                              if string.is_a?(Proc(Hash(String, RowContent), RowContent))
+                              if string.is_a?(RowProc)
                                 string.call(row_hash)
                               elsif string.is_a?(StringProc)
                                 string.call

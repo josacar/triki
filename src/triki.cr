@@ -22,13 +22,25 @@ class Triki
   alias TruncateOrKeepTable = Symbol
   alias ColumnAction = Symbol
   alias Between = Range(Int32, Int32)
+  alias ColumnList = Array(String)
+  alias Columns = Array(String)
+  alias RowContent = String | Int32 | Nil
+
+  alias RowAsHash = Hash(ColumnName, RowContent)
+  alias Row = Array(RowContent)
+  alias IntRange = Range(Int32, Int32)
+
+  alias BoolProc = Proc(RowAsHash, Bool)
+  alias RowProc = Proc(RowAsHash, RowContent)
+  alias StringProc = Proc(String)
+
   alias ConfigColumnHash = Hash(Symbol, Array(Regex) |
                                         Array(String) |
                                         Int32 |
                                         Symbol |
-                                        Proc(Hash(ColumnName, String | Int32 | Nil), Bool) |
-                                        Proc(Hash(ColumnName, String | Int32 | Nil), String | Int32 | Nil) |
-                                        Proc(String) |
+                                        BoolProc |
+                                        RowProc |
+                                        StringProc |
                                         String |
                                         Between |
                                         Bool)
@@ -36,7 +48,6 @@ class Triki
   alias ConfigTableHash = Hash(ColumnName, ConfigColumn)
   alias ConfigTable = ConfigTableHash | TruncateOrKeepTable
   alias ConfigHash = Hash(TableName, ConfigTable)
-  alias ColumnList = Array(String)
 
   # Make a new Triki object.  Pass in a configuration structure to define how the obfuscation should be
   # performed.  See the README.rdoc file for more information.
