@@ -1,10 +1,6 @@
 name: Crystal CI
 
 on: [push, pull_request]
-# push:
-#   branches: [ $default-branch ]
-# pull_request:
-#   branches: [ $default-branch ]
 
 jobs:
   build:
@@ -17,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Crystal Ameba Linter
-      uses: crystal-ameba/github-action@v0.2.12
+      uses: crystal-ameba/github-action@v0.8.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Install dependencies
