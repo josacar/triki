@@ -3,7 +3,8 @@ require "log"
 # Class for obfuscating MySQL dumps. This can parse mysqldump outputs when using the -c option, which includes
 # column names in the insert statements.
 class Triki
-  property config, globally_kept_columns = Array(String).new, fail_on_unspecified_columns = false, database_type = :mysql, scaffolded_tables, faker
+  property config, globally_kept_columns = Array(String).new, database_type = :mysql, scaffolded_tables, faker
+  property? fail_on_unspecified_columns = false
 
   @faker = Faker
 
@@ -83,7 +84,7 @@ class Triki
     database_helper.generate_config(self, config, input_io, output_io)
   end
 
-  def reassembling_each_insert(line : String, table_name : String, columns, ignore = false)
+  def reassembling_each_insert(line : String, table_name : String, columns, ignore = false, &)
     output = database_helper.rows_to_be_inserted(line).map do |sub_insert|
       result = yield(sub_insert)
       result.map do |i|

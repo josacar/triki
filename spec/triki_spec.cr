@@ -148,7 +148,6 @@ describe Triki do
           INSERT INTO some_table (email, name, something, age) VALUES ('','', '', 25);
           SQL
 
-
         it "raises an error if using postgres with insert statements" do
           expect_raises(RuntimeError) do
             obfuscator = Triki.new({
@@ -261,51 +260,51 @@ describe Triki do
       end
 
       context "when there is something to obfuscate" do
-          string = <<-SQL
+        string = <<-SQL
           INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54),('dontmurderme@direwolf.com','direwolf', 'somethingelse3', 44);
           INSERT INTO `another_table` (`a`, `b`, `c`, `d`) VALUES (1,2,3,4), (5,6,7,8);
           INSERT INTO `some_table_to_keep` (`a`, `b`, `c`, `d`) VALUES (1,2,3,4), (5,6,7,8);
           INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES ('hello','kjhjd^&dkjh', 'aawefjkafe', 'wadus'), ('hello1','kjhj!', 892938, 'tradus'), ('hello2','moose!!', NULL, NULL);
           INSERT INTO `an_ignored_table` (`col`, `col2`) VALUES ('hello','kjhjd^&dkjh'), ('hello1','kjhj!'), ('hello2','moose!!');
           SQL
-          database_dump = IO::Memory.new(string)
+        database_dump = IO::Memory.new(string)
 
-          ddo = Triki.new({
-            "some_table" => {
-              "email" => {
-                :type         => :email,
-                :skip_regexes => [
-                  /^[\w\.\_]+@honk\.com$/i,
-                  /^dontmurderme@direwolf.com$/,
-                ],
-              },
-              "name" => {
-                :type   => :string,
-                :length => 8,
-                :chars  => Triki::USERNAME_CHARS,
-              },
-              "age" => {
-                :type    => :integer,
-                :between => 10...80,
-              },
+        ddo = Triki.new({
+          "some_table" => {
+            "email" => {
+              :type         => :email,
+              :skip_regexes => [
+                /^[\w\.\_]+@honk\.com$/i,
+                /^dontmurderme@direwolf.com$/,
+              ],
             },
-            "another_table"      => :truncate,
-            "some_table_to_keep" => :keep,
-            "one_more_table"     => {
-              # Note: fixed strings must be pre-SQL escaped!
-              "password" => {
-                :type   => :fixed,
-                :string => "monkey",
-              },
-              "c" => {
-                :type => :null,
-              },
+            "name" => {
+              :type   => :string,
+              :length => 8,
+              :chars  => Triki::USERNAME_CHARS,
             },
-          })
-          output = IO::Memory.new
-          ddo.obfuscate(database_dump, output)
-          output.rewind
-          output_string = output.gets_to_end
+            "age" => {
+              :type    => :integer,
+              :between => 10...80,
+            },
+          },
+          "another_table"      => :truncate,
+          "some_table_to_keep" => :keep,
+          "one_more_table"     => {
+            # Note: fixed strings must be pre-SQL escaped!
+            "password" => {
+              :type   => :fixed,
+              :string => "monkey",
+            },
+            "c" => {
+              :type => :null,
+            },
+          },
+        })
+        output = IO::Memory.new
+        ddo.obfuscate(database_dump, output)
+        output.rewind
+        output_string = output.gets_to_end
 
         it "should be able to truncate tables" do
           output_string.should_not contain("INSERT INTO `another_table`")
@@ -555,7 +554,7 @@ describe Triki do
         output = IO::Memory.new
         ddo.scaffold(database_dump, output)
         output.rewind
-        output_string =output.gets_to_end
+        output_string = output.gets_to_end
 
         it "should scaffold missing columns" do
           output_string.should match(/"age"\s+=>\s+:keep.+scaffold/)
@@ -656,7 +655,7 @@ describe Triki do
           },
         })
         ddo.database_type = :sql_server
-        output =  IO::Memory.new
+        output = IO::Memory.new
 
         it "should raise an error if a column name can't be found" do
           expect_raises(RuntimeError) do
@@ -878,7 +877,7 @@ describe Triki do
         output = IO::Memory.new
         ddo.scaffold(database_dump, output)
         output.rewind
-        output_string =output.gets_to_end
+        output_string = output.gets_to_end
 
         it "should enumerate extra columns" do
           output_string.should match(/\#\s*"gender"/)
