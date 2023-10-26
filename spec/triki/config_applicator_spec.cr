@@ -267,7 +267,7 @@ describe Triki::ConfigApplicator do
         new_row = Triki::ConfigApplicator.apply_table_config(
           row: ["address", "city", "first", "last", "fullname", "some text"],
           table_config: ConfigTableHash{"a" => :address, "b" => :city, "c" => :first_name, "d" => :last_name, "e" => :name, "f" => :lorem},
-          columns:["a", "b", "c", "d", "e", "f"],
+          columns: ["a", "b", "c", "d", "e", "f"],
           faker: MyFaker
         )
         new_row.each { |value| value.as(String).should_not contain("'") }

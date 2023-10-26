@@ -86,7 +86,7 @@ class Triki
     end
 
     def formatted_line(column, definition, comment = nil)
-      colon_string = if (definition.to_s[0] == '{' || definition.to_s[0] == ':')
+      colon_string = if definition.to_s[0] == '{' || definition.to_s[0] == ':'
                        definition.to_s
                      else
                        ":#{definition}"
