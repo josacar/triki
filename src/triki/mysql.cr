@@ -20,12 +20,28 @@ class Triki
       end
     end
 
-    def make_insert_statement(table_name, column_names, values, ignore = nil)
-      values_strings = values.map do |string_values|
-        "(" + string_values.join(",") + ")"
-      end.join(",")
+    def make_insert_statement(table_name, column_names, rows, ignore = nil)
+      String.build do |buffer|
+        buffer << %{INSERT #{ignore ? "IGNORE " : "" }INTO `#{table_name}` (`#{column_names.join("`, `")}`) VALUES }
+        write_rows(buffer, rows)
+        buffer << ";"
+      end
+    end
 
-      "INSERT #{ignore ? "IGNORE " : ""}INTO `#{table_name}` (`#{column_names.join("`, `")}`) VALUES #{values_strings};"
+    def write_rows(buffer, rows)
+      rows.each_with_index do |row_values, i|
+        buffer << "("
+        write_row_values(buffer, row_values)
+        buffer << ")"
+        buffer << "," if i < rows.size - 1
+      end
+    end
+
+    def write_row_values(buffer, row_values)
+      row_values.each_with_index do |value, j|
+        buffer << value
+        buffer << "," if j < row_values.size - 1
+      end
     end
 
     def insert_regex
