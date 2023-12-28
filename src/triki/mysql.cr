@@ -2,7 +2,7 @@
 require "string_scanner"
 
 class Triki
-  struct Mysql
+  struct Mysql < Base
     alias Field = String?
     alias Fields = Array(Field)
     alias Rows = Array(Fields)
@@ -22,7 +22,7 @@ class Triki
 
     def make_insert_statement(table_name, column_names, rows, ignore = nil)
       String.build do |buffer|
-        buffer << %{INSERT #{ignore ? "IGNORE " : "" }INTO `#{table_name}` (`#{column_names.join("`, `")}`) VALUES }
+        buffer << %{INSERT #{ignore ? "IGNORE " : ""}INTO `#{table_name}` (`#{column_names.join("`, `")}`) VALUES }
         write_rows(buffer, rows)
         buffer << ";"
       end

@@ -24,7 +24,6 @@ class Triki
   alias ColumnAction = Symbol
   alias Between = Range(Int32, Int32)
   alias ColumnList = Array(String)
-  alias Columns = Array(String)
   alias RowContent = String | Int32 | Nil
 
   alias RowAsHash = Hash(ColumnName, RowContent)
@@ -127,7 +126,7 @@ class Triki
     end
   end
 
-  def obfuscate_bulk_insert_line(line, table_name : String, columns : ColumnList, ignore = false)
+  def obfuscate_bulk_insert_statement(line, table_name : String, columns : ColumnList, ignore = false)
     table_config = config[table_name]
 
     case table_config

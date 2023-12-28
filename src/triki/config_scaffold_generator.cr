@@ -1,28 +1,26 @@
 class Triki
   module ConfigScaffoldGenerator
+    macro included
+      def table_data(line)
+        {% if @type.name == "Triki::Postgres" %}
+          parse_copy_statement(line)
+        {% else %}
+          parse_insert_statement(line)
+        {% end %}
+      end
+    end
+
     def generate_config(obfuscator, config, input_io, output_io)
       buffer = IO::Memory.new
 
-      input_io.each_line(chomp: false) do |line|
-        if obfuscator.database_type == :postgres
-          parse_copy_statement = ->(statement_line : String) do
-            if regex_match = /^\s*COPY (.*?) \((.*?)\) FROM\s*/i.match(statement_line)
-              {
-                "table_name"   => regex_match[1],
-                "column_names" => regex_match[2].split(/\s*,\s*/),
-              }
-            end
-          end
-          table_data = parse_copy_statement.call(line)
-        else
-          table_data = parse_insert_statement(line)
-        end
+      while statement = input_io.gets(';')
+        table_data = table_data(statement)
         next unless table_data
 
-        table_name = table_data["table_name"].as(String)
+        table_name = table_data["table_name"].as(TableName)
         next if obfuscator.scaffolded_tables[table_name]? # only process each table_name once
 
-        columns = table_data["column_names"].as(Array(String))
+        columns = table_data["column_names"].as(ColumnList)
         table_config = config[table_name]?
         next if table_config == :truncate || table_config == :keep
 

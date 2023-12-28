@@ -74,8 +74,8 @@ describe Triki do
         },
         "another_table"      => :truncate,
         "some_table_to_keep" => :keep,
-      }).tap do |o|
-        o.database_type = :postgres
+      }).tap do |my_obfuscator|
+        my_obfuscator.database_type = :postgres
       end
 
       output = IO::Memory.new
@@ -179,8 +179,8 @@ describe Triki do
               },
               "another_table"      => :truncate,
               "some_table_to_keep" => :keep,
-            }).tap do |o|
-              o.database_type = :postgres
+            }).tap do |my_obfuscator|
+              my_obfuscator.database_type = :postgres
             end
 
             output = IO::Memory.new
@@ -369,6 +369,34 @@ describe Triki do
           output_string.should_not contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES ('hello','kjhjd^&dkjh',NULL, 'wadus'),('hello1','kjhj!',NULL, 'tradus'),('hello2','moose!!',NULL, NULL);")
           output_string.should_not contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES ('hello','kjhjd^&dkjh',NULL,'wadus'),('hello1','kjhj!',NULL,'tradus'),('hello2','moose!!',NULL,NULL);")
           output_string.should_not contain("INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);")
+        end
+
+        context "with MariaDB >= 10.7.1 dump" do
+          it "should obfuscate the tables and remove newlines" do
+            string = <<-SQL
+              INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),
+              ('joe@joe.com','joe', 'somethingelse2', 54),
+              ('dontmurderme@direwolf.com','direwolf', 'somethingelse3', 44);
+              INSERT INTO `another_table` (`a`, `b`, `c`, `d`) VALUES (1,2,3,4),
+              (5,6,7,8);
+              INSERT INTO `some_table_to_keep` (`a`, `b`, `c`, `d`) VALUES (1,2,3,4),
+              (5,6,7,8);
+              INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES ('hello','kjhjd^&dkjh', 'aawefjkafe', 'wadus'),
+              ('hello1','kjhj!', 892938, 'tradus'),
+              ('hello2','moose!!', NULL, NULL);
+              INSERT INTO `an_ignored_table` (`col`, `col2`) VALUES ('hello','kjhjd^&dkjh'),
+              ('hello1','kjhj!'),
+              ('hello2','moose!!');
+            SQL
+
+            output_string.should contain("INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES (")
+            output_string.should contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES (")
+            output_string.should contain("'some\\'thin,ge())lse1'")
+            output_string.should contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES ('hello','monkey',NULL,'wadus'),('hello1','monkey',NULL,'tradus'),('hello2','monkey',NULL,NULL);")
+            output_string.should_not contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES ('hello','kjhjd^&dkjh',NULL, 'wadus'),('hello1','kjhj!',NULL, 'tradus'),('hello2','moose!!',NULL, NULL);")
+            output_string.should_not contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES ('hello','kjhjd^&dkjh',NULL,'wadus'),('hello1','kjhj!',NULL,'tradus'),('hello2','moose!!',NULL,NULL);")
+            output_string.should_not contain("INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);")
+          end
         end
 
         it "honors a special case: on the people table, rows with skip_regexes that match are skipped" do
