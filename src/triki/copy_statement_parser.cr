@@ -34,7 +34,7 @@ class Triki
 
           output_io.print(line)
         elsif inside_copy_statement
-          obfuscated_line = obfuscator.obfuscate_bulk_insert_line(line, current_table_name, current_columns)
+          obfuscated_line = obfuscator.obfuscate_bulk_insert_statement(line, current_table_name, current_columns)
           output_io.puts(obfuscated_line) unless obfuscated_line.empty?
         else
           output_io.print(line)
