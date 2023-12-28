@@ -6,7 +6,7 @@ class Triki
     alias RowContent = Triki::RowContent
 
     # ameba:disable Metrics/CyclomaticComplexity
-    def self.apply_table_config(row : Array(String?), table_config : Triki::ConfigTableHash, columns : Columns, faker = Faker, dictionary = EnglishDictionary)
+    def self.apply_table_config(row : Array(String?), table_config : Triki::ConfigTableHash, columns : ColumnList, faker = Faker, dictionary = EnglishDictionary)
       return row unless table_config.is_a?(Hash)
 
       row_hash = row_as_hash(row, columns)

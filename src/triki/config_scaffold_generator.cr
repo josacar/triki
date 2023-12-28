@@ -19,10 +19,10 @@ class Triki
         end
         next unless table_data
 
-        table_name = table_data["table_name"].as(String)
+        table_name = table_data["table_name"].as(TableName)
         next if obfuscator.scaffolded_tables[table_name]? # only process each table_name once
 
-        columns = table_data["column_names"].as(Array(String))
+        columns = table_data["column_names"].as(ColumnList)
         table_config = config[table_name]?
         next if table_config == :truncate || table_config == :keep
 

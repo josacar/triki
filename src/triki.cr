@@ -24,7 +24,6 @@ class Triki
   alias ColumnAction = Symbol
   alias Between = Range(Int32, Int32)
   alias ColumnList = Array(String)
-  alias Columns = Array(String)
   alias RowContent = String | Int32 | Nil
 
   alias RowAsHash = Hash(ColumnName, RowContent)
