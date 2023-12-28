@@ -115,8 +115,8 @@ class Triki
     end
 
     def self.row_as_hash(row : Array, columns : Array) : RowAsHash
-      columns.zip(row).each_with_object(RowAsHash.new) do |(name, value), m|
-        m[name] = value
+      columns.zip(row).each_with_object(RowAsHash.new) do |(name, value), row_as_hash|
+        row_as_hash[name] = value
       end
     end
 

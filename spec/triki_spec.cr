@@ -74,8 +74,8 @@ describe Triki do
         },
         "another_table"      => :truncate,
         "some_table_to_keep" => :keep,
-      }).tap do |o|
-        o.database_type = :postgres
+      }).tap do |my_obfuscator|
+        my_obfuscator.database_type = :postgres
       end
 
       output = IO::Memory.new
@@ -179,8 +179,8 @@ describe Triki do
               },
               "another_table"      => :truncate,
               "some_table_to_keep" => :keep,
-            }).tap do |o|
-              o.database_type = :postgres
+            }).tap do |my_obfuscator|
+              my_obfuscator.database_type = :postgres
             end
 
             output = IO::Memory.new
@@ -389,13 +389,13 @@ describe Triki do
               ('hello2','moose!!');
             SQL
 
-          output_string.should contain("INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES (")
-          output_string.should contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES (")
-          output_string.should contain("'some\\'thin,ge())lse1'")
-          output_string.should contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES ('hello','monkey',NULL,'wadus'),('hello1','monkey',NULL,'tradus'),('hello2','monkey',NULL,NULL);")
-          output_string.should_not contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES ('hello','kjhjd^&dkjh',NULL, 'wadus'),('hello1','kjhj!',NULL, 'tradus'),('hello2','moose!!',NULL, NULL);")
-          output_string.should_not contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES ('hello','kjhjd^&dkjh',NULL,'wadus'),('hello1','kjhj!',NULL,'tradus'),('hello2','moose!!',NULL,NULL);")
-          output_string.should_not contain("INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);")
+            output_string.should contain("INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES (")
+            output_string.should contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES (")
+            output_string.should contain("'some\\'thin,ge())lse1'")
+            output_string.should contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES ('hello','monkey',NULL,'wadus'),('hello1','monkey',NULL,'tradus'),('hello2','monkey',NULL,NULL);")
+            output_string.should_not contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES ('hello','kjhjd^&dkjh',NULL, 'wadus'),('hello1','kjhj!',NULL, 'tradus'),('hello2','moose!!',NULL, NULL);")
+            output_string.should_not contain("INSERT INTO `one_more_table` (`a`, `password`, `c`, `d,d`) VALUES ('hello','kjhjd^&dkjh',NULL,'wadus'),('hello1','kjhj!',NULL,'tradus'),('hello2','moose!!',NULL,NULL);")
+            output_string.should_not contain("INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);")
           end
         end
 
