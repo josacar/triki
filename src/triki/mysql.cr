@@ -2,7 +2,7 @@
 require "string_scanner"
 
 class Triki
-  struct Mysql
+  struct Mysql < Base
     alias Field = String?
     alias Fields = Array(Field)
     alias Rows = Array(Fields)

@@ -1,5 +1,5 @@
 class Triki
-  struct Postgres
+  struct Postgres < Base
     include Triki::ConfigScaffoldGenerator
 
     # Postgres uses COPY statements instead of INSERT and look like:

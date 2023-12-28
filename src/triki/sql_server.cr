@@ -1,5 +1,5 @@
 class Triki
-  struct SqlServer
+  struct SqlServer < Base
     include Triki::InsertStatementParser
     include Triki::ConfigScaffoldGenerator
 
