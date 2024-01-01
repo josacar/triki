@@ -2,7 +2,24 @@
 
 [![Build Status](https://github.com/josacar/triki/workflows/Crystal%20CI/badge.svg)](https://github.com/josacar/triki/actions)
 
-You want to develop against real production data, but you don't want to violate your users' privacy.  Enter Triki: standalone Crystal code for the selective rewriting of SQL dumps in order to protect user privacy.  It supports MySQL, Postgres, and SQL Server.
+You want to develop against real production data, but you don't want to violate your users' privacy.  Enter Triki: standalone Crystal code for the selective rewriting of SQL dumps in order to protect user privacy.
+
+
+# Supported databases and versions
+
+## Servers
+
+- MySQL
+- Postgres
+- SQL Server
+
+## Clients
+
+- `pg_dump` ( Postgresql ) up to 15.x
+- `mysqldump` ( MySQL ) up to 8.2
+- `mysqldump` ( MariaDB ) aka `mariadb-dump` ( since v0.3.0 ) up to 10.11
+
+**Note**: Clients may break current SQL dump parsing as by now there is no proper integration testing in CI with all combinations of servers and clients versions, above versions have been partially manually tested.
 
 # Install
 
