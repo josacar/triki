@@ -39,6 +39,12 @@ describe Triki::Mysql do
       fields = [["bla", "blobdata", "blubb", "0xACED00057372001F6A6176612E7574696C2E436F6C6C656"]]
       subject.rows_to_be_inserted(string).should eq(fields)
     end
+
+    it "should work with values with semicolons" do
+      string = "INSERT INTO `some_table` (thing1,thing2) VALUES ('bla' , 'blob;data', 'blubb' , 'blubb') ;"
+      fields = [["bla", "blob;data", "blubb", "blubb"]]
+      subject.rows_to_be_inserted(string).should eq(fields)
+    end
   end
 
   describe "#make_valid_value_string" do
