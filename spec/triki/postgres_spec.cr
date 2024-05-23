@@ -54,8 +54,8 @@ describe Triki::Postgres do
     it "parses table name and column names" do
       line = "COPY some_table (id, email, name, something) FROM stdin;"
       hash = subject.parse_copy_statement(line) || raise "Error"
-      hash["table_name"].should eq("some_table")
-      hash["column_names"].should eq(["id", "email", "name", "something"])
+      hash[:table_name].should eq("some_table")
+      hash[:column_names].should eq(["id", "email", "name", "something"])
     end
   end
 

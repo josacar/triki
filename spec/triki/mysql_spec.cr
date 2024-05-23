@@ -80,14 +80,14 @@ describe Triki::Mysql do
 
     it "should return a hash of table name, column names for MySQL insert statements" do
       hash = subject.parse_insert_statement("INSERT INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);")
-      hash.should eq({"ignore" => false, "table_name" => "some_table", "column_names" => ["email", "name", "something", "age"]})
+      hash.should eq({ignore: false, table_name: "some_table", column_names: ["email", "name", "something", "age"]})
     end
   end
 
   describe "#parse_insert_ignore_statement" do
     it "should return a hash of IGNORE, table name, column names for MySQL insert statements" do
       hash = subject.parse_insert_statement("INSERT IGNORE INTO `some_table` (`email`, `name`, `something`, `age`) VALUES ('bob@honk.com','bob', 'some\\'thin,ge())lse1', 25),('joe@joe.com','joe', 'somethingelse2', 54);")
-      hash.should eq({"ignore" => true, "table_name" => "some_table", "column_names" => ["email", "name", "something", "age"]})
+      hash.should eq({ignore: true, table_name: "some_table", column_names: ["email", "name", "something", "age"]})
     end
   end
 end

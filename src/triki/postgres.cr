@@ -1,5 +1,6 @@
 class Triki
   struct Postgres < Base
+    alias Table = NamedTuple(table_name: String, column_names: ColumnList)
     include Triki::ConfigScaffoldGenerator
 
     # Postgres uses COPY statements instead of INSERT and look like:
@@ -23,8 +24,8 @@ class Triki
         if table_data = parse_copy_statement(line)
           inside_copy_statement = true
 
-          current_table_name = table_data["table_name"].as(String)
-          current_columns = table_data["column_names"].as(ColumnList)
+          current_table_name = table_data[:table_name]
+          current_columns = table_data[:column_names]
 
           if !config[current_table_name]
             Log.warn { "Deprecated: #{current_table_name} was not specified in the config.  A future release will cause this to be an error.  Please specify the table definition or set it to :keep." }
@@ -71,10 +72,10 @@ class Triki
     def parse_copy_statement(line)
       return unless regex_match = /^\s*COPY (.*?) \((.*?)\) FROM\s*/i.match(line)
 
-      {
-        "table_name"   => regex_match[1],
-        "column_names" => regex_match[2].split(/\s*,\s*/),
-      }
+      Table.new(
+        table_name: regex_match[1],
+        column_names: regex_match[2].split(/\s*,\s*/),
+      )
     end
 
     def make_insert_statement(table_name, column_names, values, ignore = nil)

@@ -3,8 +3,8 @@ class Triki
     def parse(obfuscator, config, input_io, output_io)
       while statement = input_io.gets(");\n")
         if table_data = parse_insert_statement(statement)
-          table_name = table_data["table_name"].as(String)
-          columns = table_data["column_names"].as(Array(String))
+          table_name = table_data[:table_name]
+          columns = table_data[:column_names]
           ignore = table_data["ignore"]?
 
           if config[table_name]?

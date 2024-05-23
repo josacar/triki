@@ -6,17 +6,19 @@ class Triki
     alias Field = String?
     alias Fields = Array(Field)
     alias Rows = Array(Fields)
+    alias Table = NamedTuple(ignore: Bool, table_name: String, column_names: ColumnList)
 
     include Triki::InsertStatementParser
     include Triki::ConfigScaffoldGenerator
 
     def parse_insert_statement(line)
       return unless regex_match = insert_regex.match(line)
-      {
-        "ignore"       => !regex_match[1]?.nil?,
-        "table_name"   => regex_match[2],
-        "column_names" => regex_match[3].split(/`\s*,\s*`/).map(&.gsub('`', "")),
-      }
+
+      Table.new(
+        ignore: !regex_match[1]?.nil?,
+        table_name: regex_match[2],
+        column_names: regex_match[3].split(/`\s*,\s*`/).map(&.gsub('`', ""))
+      )
     end
 
     def make_insert_statement(table_name, column_names, rows, ignore = nil)

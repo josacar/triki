@@ -1,15 +1,16 @@
 class Triki
   struct SqlServer < Base
+    alias Table = NamedTuple(table_name: String, column_names: ColumnList)
     include Triki::InsertStatementParser
     include Triki::ConfigScaffoldGenerator
 
     def parse_insert_statement(line)
       return unless regex_match = insert_regex.match(line)
 
-      {
-        "table_name"   => regex_match[1],
-        "column_names" => regex_match[2].split(/\]\s*,\s*\[/).map(&.gsub(/[\[\]]/, "")),
-      }
+      Table.new(
+        table_name: regex_match[1],
+        column_names: regex_match[2].split(/\]\s*,\s*\[/).map(&.gsub(/[\[\]]/, ""))
+      )
     end
 
     def rows_to_be_inserted(line)
