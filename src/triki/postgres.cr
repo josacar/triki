@@ -18,9 +18,9 @@ class Triki
       inside_copy_statement = false
 
       input_io.each_line(chomp: false) do |line|
-        if parse_insert_statement(line)
-          raise RuntimeError.new("Cannot obfuscate Postgres dumps containing INSERT statements. Please use COPY statments.")
-        elsif table_data = parse_copy_statement(line)
+        raise RuntimeError.new("Cannot obfuscate Postgres dumps containing INSERT statements. Please use COPY statments.") if parse_insert_statement(line)
+
+        if table_data = parse_copy_statement(line)
           inside_copy_statement = true
 
           current_table_name = table_data["table_name"].as(String)
@@ -69,12 +69,12 @@ class Triki
     end
 
     def parse_copy_statement(line)
-      if regex_match = /^\s*COPY (.*?) \((.*?)\) FROM\s*/i.match(line)
-        {
-          "table_name"   => regex_match[1],
-          "column_names" => regex_match[2].split(/\s*,\s*/),
-        }
-      end
+      return unless regex_match = /^\s*COPY (.*?) \((.*?)\) FROM\s*/i.match(line)
+
+      {
+        "table_name"   => regex_match[1],
+        "column_names" => regex_match[2].split(/\s*,\s*/),
+      }
     end
 
     def make_insert_statement(table_name, column_names, values, ignore = nil)

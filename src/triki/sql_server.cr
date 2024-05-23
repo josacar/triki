@@ -4,12 +4,12 @@ class Triki
     include Triki::ConfigScaffoldGenerator
 
     def parse_insert_statement(line)
-      if regex_match = insert_regex.match(line)
-        {
-          "table_name"   => regex_match[1],
-          "column_names" => regex_match[2].split(/\]\s*,\s*\[/).map(&.gsub(/[\[\]]/, "")),
-        }
-      end
+      return unless regex_match = insert_regex.match(line)
+
+      {
+        "table_name"   => regex_match[1],
+        "column_names" => regex_match[2].split(/\]\s*,\s*\[/).map(&.gsub(/[\[\]]/, "")),
+      }
     end
 
     def rows_to_be_inserted(line)
