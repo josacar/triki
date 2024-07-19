@@ -652,6 +652,119 @@ describe Triki do
           output_string.should match(/"age_of_the_individual_who_is_specified_by_this_row_of_the_table"/)
         end
       end
+
+      describe "obfuscating a full MariaDB dump" do
+        output_string = begin
+          string = <<-SQL
+            -- MySQL dump 10.13  Distrib 8.0.37, for Linux (x86_64)
+            --
+            -- Host: localhost    Database: test
+            -- ------------------------------------------------------
+            -- Server version	8.0.37-0ubuntu0.22.04.3
+
+            /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+            /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+            /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+            /*!50503 SET NAMES utf8mb4 */;
+            /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+            /*!40103 SET TIME_ZONE='+00:00' */;
+            /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+            /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+            /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+            /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+            --
+            -- Table structure for table `people`
+            --
+
+            DROP TABLE IF EXISTS `people`;
+            /*!40101 SET @saved_cs_client     = @@character_set_client */;
+            /*!50503 SET character_set_client = utf8mb4 */;
+            CREATE TABLE `people` (
+              `id` int NOT NULL AUTO_INCREMENT,
+              `email` varchar(60) NOT NULL,
+              `crypted_password` varchar(32) NOT NULL,
+              `bank_account` int NOT NULL,
+              `name` varchar(20) NOT NULL,
+              `full_address` varchar(256) NOT NULL,
+              `bio` text NOT NULL,
+              `relationship_status` varchar(70) NOT NULL,
+              PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+            /*!40101 SET character_set_client = @saved_cs_client */;
+
+            --
+            -- Dumping data for table `people`
+            --
+
+            LOCK TABLES `people` WRITE;
+            /*!40000 ALTER TABLE `people` DISABLE KEYS */;
+            INSERT INTO `people` (`id`, `email`, `crypted_password`, `bank_account`, `name`, `full_address`, `bio`, `relationship_status`) VALUES (1,'p.raj@gmail.com','vghbdj54-gbh=nj@%^gvbcd',456123588,'Pratush','My Random Address','This is just a Random Bio','SINGLE');
+            /*!40000 ALTER TABLE `people` ENABLE KEYS */;
+            UNLOCK TABLES;
+            /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+            /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+            /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+            /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+            /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+            /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+            /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+            /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+            -- Dump completed on 2024-07-15 20:09:52
+          SQL
+
+          database_dump = IO::Memory.new(string)
+
+          ddo = Triki.new({
+            "people" => {
+              "email"                     => { :type => :email, :skip_regexes => [/^[\w\.\_]+@my_company\.com$/i] },
+              "crypted_password"          => { :type => :fixed, :string => "SOME_FIXED_PASSWORD_FOR_EASE_OF_DEBUGGING" },
+              "bank_account"              => { :type => :fixed, :string =>  ->(row : Triki::RowAsHash) { "#{row["bank_account"].to_s[0..4]}#{"*" * (row["email"].to_s.size - 5)}".as(Triki::RowContent) } },
+              "name"                      => :name,
+              "full_address"              => :address,
+              "bio"                       => { :type => :lorem, :number => 4 },
+              "relationship_status"       => { :type => :fixed, :one_of => ["Single", "Divorced", "Married", "Engaged", "In a Relationship"] },
+            }
+          })
+
+          output = IO::Memory.new
+          ddo.obfuscate(database_dump, output)
+          ddo.fail_on_unspecified_columns = true
+          ddo.globally_kept_columns = %w[id]
+          output.rewind
+          output.gets_to_end
+        end
+
+        it "obfuscates with email and skip_regexes" do
+          output_string.should_not contain("p.raj@gmail.com")
+        end
+
+        it "obfuscates with fixed string" do
+          output_string.should_not contain("vghbdj54-gbh=nj@%^gvbcd")
+        end
+
+        it "obfuscates with a lambda string output" do
+          output_string.should_not contain("456123588")
+        end
+
+        it "obfuscates with random name" do
+          output_string.should_not contain("Pratush")
+        end
+
+        it "obfuscates with a full address" do
+          output_string.should_not contain("My Random Address")
+        end
+
+        it "obfuscates with a random lorem" do
+          output_string.should_not contain("This is just a Random Bio")
+        end
+
+        it "obfuscates with a enum" do
+          output_string.should_not contain("SINGLE")
+        end
+      end
     end
 
     describe "when using MS SQL Server" do
