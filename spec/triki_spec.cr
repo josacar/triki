@@ -719,14 +719,14 @@ describe Triki do
 
           ddo = Triki.new({
             "people" => {
-              "email"                     => { :type => :email, :skip_regexes => [/^[\w\.\_]+@my_company\.com$/i] },
-              "crypted_password"          => { :type => :fixed, :string => "SOME_FIXED_PASSWORD_FOR_EASE_OF_DEBUGGING" },
-              "bank_account"              => { :type => :fixed, :string =>  ->(row : Triki::RowAsHash) { "#{row["bank_account"].to_s[0..4]}#{"*" * (row["email"].to_s.size - 5)}".as(Triki::RowContent) } },
-              "name"                      => :name,
-              "full_address"              => :address,
-              "bio"                       => { :type => :lorem, :number => 4 },
-              "relationship_status"       => { :type => :fixed, :one_of => ["Single", "Divorced", "Married", "Engaged", "In a Relationship"] },
-            }
+              "email"               => {:type => :email, :skip_regexes => [/^[\w\.\_]+@my_company\.com$/i]},
+              "crypted_password"    => {:type => :fixed, :string => "SOME_FIXED_PASSWORD_FOR_EASE_OF_DEBUGGING"},
+              "bank_account"        => {:type => :fixed, :string => ->(row : Triki::RowAsHash) { "#{row["bank_account"].to_s[0..4]}#{"*" * (row["email"].to_s.size - 5)}".as(Triki::RowContent) }},
+              "name"                => :name,
+              "full_address"        => :address,
+              "bio"                 => {:type => :lorem, :number => 4},
+              "relationship_status" => {:type => :fixed, :one_of => ["Single", "Divorced", "Married", "Engaged", "In a Relationship"]},
+            },
           })
 
           output = IO::Memory.new
