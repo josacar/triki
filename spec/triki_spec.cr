@@ -743,6 +743,7 @@ describe Triki do
 
         it "obfuscates with fixed string" do
           output_string.should_not contain("vghbdj54-gbh=nj@%^gvbcd")
+          output_string.should contain("SOME_FIXED_PASSWORD_FOR_EASE_OF_DEBUGGING")
         end
 
         it "obfuscates with a lambda string output" do
