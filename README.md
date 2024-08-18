@@ -4,6 +4,9 @@
 
 You want to develop against real production data, but you don't want to violate your users' privacy.  Enter Triki: standalone Crystal code for the selective rewriting of SQL dumps in order to protect user privacy.
 
+# Documentation
+
+[Here](https://josacar.github.io/triki/) you can find the latest generated API documentation about this library.
 
 # Supported databases and versions
 
