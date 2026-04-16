@@ -343,7 +343,7 @@ That's about 6.40x speedup compared to the Ruby version.
 2. Create a feature branch for your change.
 3. Add tests for any new functionality.
 4. Run the test suite (`crystal spec`) and make sure everything passes.
-5. Run the linter (`crystal bin/ameba`) and fix any issues.
+5. Run the linter (`bin/ameba`) and fix any issues.
 6. Send a pull request.
 
 ## Thanks

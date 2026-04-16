@@ -125,7 +125,7 @@ describe Triki::ConfigApplicator do
     end
 
     it "should be able to substitute a proc that returns a string" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"b" => ConfigColumnHash{:type => :fixed, :string => ->{ "Hello World" }}}, ["a", "b", "c"])
+      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"b" => ConfigColumnHash{:type => :fixed, :string => -> { "Hello World" }}}, ["a", "b", "c"])
       new_row.size.should eq(3)
       new_row[1].should eq("Hello World")
     end

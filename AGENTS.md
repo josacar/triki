@@ -19,10 +19,10 @@ shards install
 crystal spec
 
 # Run linter
-crystal bin/ameba
+bin/ameba
 
-# Build (if a binary target exists)
-crystal build src/triki.cr
+# Build (compile a custom script that uses triki)
+crystal build --release obfuscator.cr
 ```
 
 ## Project Structure
@@ -121,7 +121,7 @@ The main `Triki` class defines many type aliases (`RowAsHash`, `ConfigColumn`, e
 |---------|-------------|
 | `crystal spec` | Run all tests |
 | `crystal spec spec/triki/triki_spec.cr` | Run main spec |
-| `crystal bin/ameba` | Run linter |
+| `bin/ameba` | Run linter |
 | `crystal tool format` | Format code |
 | `crystal docs` | Generate API docs |
 
