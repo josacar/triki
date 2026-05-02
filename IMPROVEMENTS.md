@@ -35,32 +35,24 @@ raise RuntimeError.new("Unknown conditional method: #{conditional_method}")
 
 ## Code Duplication
 
-### DUP-1: Deprecation warning string (3 copies)
-Identical string repeated in:
-- `src/triki/insert_statement_parser.cr:13`
-- `src/triki/postgres.cr:30-31`
+### ~~DUP-1~~: Deprecation warning string — **FIXED** (`0ce59ea`)`
 
-Extract to a constant in `triki.cr` or `base.cr`:
-```crystal
-DEPRECATION_WARNING = "was not specified in the config. A future release will cause this to be an error. Please specify the table definition or set it to :keep."
-```
-
-### DUP-2: `config_table_close` unused parameter
+### ~~DUP-2~~: `config_table_close` unused parameter — **FIXED** (`26fc8aa`)
 `src/triki/config_scaffold_generator.cr:56` — `table_name` parameter accepted but never used in the body.
 
-### DUP-3: `ignore` parameter unused in Postgres and SqlServer
+### ~~DUP-3~~: `ignore` parameter unused in Postgres and SqlServer — **FIXED** (`9bb923f`)
 - `src/triki/postgres.cr:81`: `ignore = nil` — accepted but unused
 - `src/triki/sql_server.cr:32`: `ignore = nil` — accepted but unused
 
 Neither dialect supports INSERT IGNORE. Consider using separate method signatures or explicitly rejecting.
 
-### DUP-4: `make_insert_statement` `ignore` defaults to `nil` but should be `false`
+### ~~DUP-4~~: `make_insert_statement` `ignore` defaults to `nil` — **FIXED** (`0ce59ea`)`
 `src/triki/mysql.cr:24` — `ignore = nil`. While `nil` is falsy and works, `false` better conveys intent (it's a boolean flag):
 ```crystal
 def make_insert_statement(table_name, column_names, rows, ignore = false)
 ```
 
-## Missing Abstract Methods in `base.cr`
+## Missing Abstract Methods in `base.cr` — **FIXED** (`e02ba32`)`
 
 `src/triki/base.cr` only declares `parse`. It should also declare the shared interface:
 ```crystal
@@ -90,7 +82,7 @@ This would enforce consistent signatures and prevent regressions.
 | `src/triki/mysql.cr` | 32,41 | `write_rows`, `write_row_values` | Parameter & return types |
 | `src/triki/config_scaffold_generator.cr` | 86 | `formatted_line` | Parameter types |
 
-## Magic Numbers
+## Magic Numbers — **FIXED** (`9743190`)`
 
 | File | Line | Value | Suggested Constant |
 |------|------|-------|-------------------|
@@ -99,7 +91,7 @@ This would enforce consistent signatures and prevent regressions.
 | `src/triki/config_scaffold_generator.cr` | 95-96 | `40` | `COLUMN_NAME_WIDTH` |
 | `src/triki/mysql.cr` | 77 | `80` | `PARSE_ERROR_PEEK_LENGTH` |
 
-## Inconsistent Error Handling
+## Inconsistent Error Handling — **FIXED** (`95ddc7b`)
 
 ### `raise` style inconsistency
 - `triki.cr` and `postgres.cr`: Properly use `raise RuntimeError.new("message")`
@@ -120,7 +112,7 @@ Standardize on `raise RuntimeError.new("descriptive message")`.
 | Log reference | `Triki::Log` (via mixin) | `Log` (unqualified) | `Triki::Log` (via mixin) |
 
 1. **Make `insert_regex` private everywhere** — it's an implementation detail.
-2. **Align `Log` references** — since all are within `class Triki`, `Log` is sufficient. Use `Log.warn` consistently (remove `Triki::` prefix from `insert_statement_parser.cr:13`).
+2. **~~Align `Log` references~~** — unified to `Log.warn` across all files (`0ce59ea`).
 
 ## Naming Improvements
 
