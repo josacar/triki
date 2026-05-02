@@ -45,7 +45,7 @@ class Triki
       end
     end
 
-    def insert_regex
+    private def insert_regex
       /^\s*INSERT\s*(IGNORE )?\s*INTO `(.*?)` \((.*?)\) VALUES\s*/i
     end
 
