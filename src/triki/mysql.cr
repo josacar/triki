@@ -29,7 +29,7 @@ class Triki
       end
     end
 
-    def write_rows(buffer, rows)
+    def write_rows(buffer : String::Builder, rows : Array(Array(RowContent)))
       rows.each_with_index do |row_values, i|
         buffer << "("
         write_row_values(buffer, row_values)
@@ -38,7 +38,7 @@ class Triki
       end
     end
 
-    def write_row_values(buffer, row_values)
+    def write_row_values(buffer : String::Builder, row_values : Array(RowContent))
       row_values.each_with_index do |value, j|
         buffer << value
         buffer << "," if j < row_values.size - 1
