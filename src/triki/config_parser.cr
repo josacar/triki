@@ -1,6 +1,6 @@
 class Triki
   module ConfigParser
-    def self.cast_bindings(bindings) : ConfigHash
+    def self.cast_bindings(bindings : ConfigHash) : ConfigHash
       type_hash = ConfigHash.new
       bindings.each do |k, v|
         type_hash[k] = cast_table(v)
@@ -8,7 +8,7 @@ class Triki
       type_hash
     end
 
-    def self.cast_table(table)
+    def self.cast_table(table : ConfigTable) : ConfigTable
       type_table = ConfigTableHash.new
       if table.is_a?(Hash)
         table.each do |k, v|
@@ -20,7 +20,7 @@ class Triki
       end
     end
 
-    def self.cast_column(column)
+    def self.cast_column(column : ConfigColumn) : ConfigColumn
       if column.is_a?(Hash)
         type_column = ConfigColumnHash.new
         column.each do |k, v|

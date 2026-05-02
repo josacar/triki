@@ -139,7 +139,7 @@ class Triki
       (between.min + (between.max - between.min) * rand).round.to_i
     end
 
-    def self.random_string(length_or_range, chars)
+    def self.random_string(length_or_range : Int32 | IntRange, chars : String) : String
       range = case length_or_range
               when .is_a?(Int32)
                 (length_or_range..length_or_range)
@@ -157,11 +157,11 @@ class Triki
       random_string
     end
 
-    def self.clean_quotes(value)
+    def self.clean_quotes(value : String) : String
       value.gsub(/['"]/, "")
     end
 
-    def self.clean_bad_whitespace(value)
+    def self.clean_bad_whitespace(value : String) : String
       value.gsub(/[\n\t\r]/, "")
     end
   end

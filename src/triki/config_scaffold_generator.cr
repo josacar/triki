@@ -10,7 +10,7 @@ class Triki
       end
     end
 
-    def generate_config(obfuscator, config, input_io, output_io)
+    def generate_config(obfuscator : Triki, config : ConfigHash, input_io : IO, output_io : IO)
       buffer = IO::Memory.new
 
       while statement = input_io.gets(';')
@@ -57,7 +57,7 @@ class Triki
       "  },"
     end
 
-    def emit_scaffold(table_name, existing_config, extra_columns, columns_to_scaffold, output_io)
+    def emit_scaffold(table_name : String, existing_config : ConfigTableHash?, extra_columns : ColumnList, columns_to_scaffold : ColumnList, output_io : IO)
       # header block: contains table name and any existing config
       if existing_config
         output_io.puts(config_table_open(table_name))
@@ -83,7 +83,7 @@ class Triki
       output_io.print config_table_close
     end
 
-    def formatted_line(column, definition, comment = nil)
+    def formatted_line(column : String, definition : ConfigColumn | String, comment : String? = nil) : String
       colon_string = if definition.to_s[0] == '{' || definition.to_s[0] == ':'
                        definition.to_s
                      else

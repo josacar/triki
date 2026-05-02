@@ -67,7 +67,7 @@ class Triki
     @fail_on_unspecified_columns
   end
 
-  def database_helper
+  def database_helper : Base
     @database_helper ||= case @database_type
                          when :sql_server
                            SqlServer.new
@@ -133,7 +133,7 @@ class Triki
     raise RuntimeError.new(error_message)
   end
 
-  def obfuscate_bulk_insert_statement(line, table_name : String, columns : ColumnList, ignore = false)
+  def obfuscate_bulk_insert_statement(line, table_name : String, columns : ColumnList, ignore = false) : String
     table_config = config[table_name]
 
     case table_config
