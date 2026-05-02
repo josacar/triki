@@ -21,7 +21,7 @@ class Triki
         definition = {:type => definition} if definition.is_a?(Symbol)
 
         number = (definition[:number]? || 1).as(Int32)
-        between = (definition[:between]? || (0..1000)).as(IntRange)
+        between = (definition[:between]? || DEFAULT_INTEGER_RANGE).as(IntRange)
         one_of = definition[:one_of]?
         length = definition[:length]?
         chars = definition[:chars]?
@@ -51,7 +51,7 @@ class Triki
                           md5 = Digest::MD5.hexdigest(rand.to_s)[0...5]
                           clean_quotes("#{faker.email}.#{md5}.example.com")
                         when :string
-                          random_string(length || 30, chars.as(String | Nil) || SENSIBLE_CHARS) if length.is_a?(Int32)
+                          random_string(length || DEFAULT_STRING_LENGTH, chars.as(String | Nil) || SENSIBLE_CHARS) if length.is_a?(Int32)
                         when :lorem
                           clean_bad_whitespace(clean_quotes(faker.lorem(number).join(".  ")))
                         when :like_english

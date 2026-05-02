@@ -92,8 +92,8 @@ class Triki
 
       column_name = %{"#{column}"}
 
-      if column.size < 40
-        %{    #{column_name.ljust(40)}  => #{colon_string},   #{comment}}
+      if column.size < COLUMN_NAME_WIDTH
+        %{    #{column_name.ljust(COLUMN_NAME_WIDTH)}  => #{colon_string},   #{comment}}
       else
         %{    #{column_name} => #{colon_string},  #{comment}}
       end
