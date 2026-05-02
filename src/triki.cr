@@ -34,7 +34,6 @@ class Triki
   alias RowContent = String | Int32 | Nil
 
   alias RowAsHash = Hash(ColumnName, RowContent)
-  alias Row = Array(RowContent)
   alias IntRange = Range(Int32, Int32)
 
   alias BoolProc = Proc(RowAsHash, Bool)

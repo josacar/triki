@@ -47,8 +47,8 @@ class Triki
 
         transformed_row[index] = case definition[:type]
                         when :email
-                          md5 = Digest::MD5.hexdigest(rand.to_s)[0...5]
-                          clean_quotes("#{faker.email}.#{md5}.example.com")
+                          hashed = Digest::MD5.hexdigest(row[index].to_s)[0...5]
+                          clean_quotes("#{faker.email}.#{hashed}.example.com")
                         when :string
                           random_string(length || DEFAULT_STRING_LENGTH, chars.as(String | Nil) || SENSIBLE_CHARS) if length.is_a?(Int32)
                         when :lorem
