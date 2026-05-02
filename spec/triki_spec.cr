@@ -45,7 +45,7 @@ describe Triki do
         \.
         SQL
 
-      obfuscator = Triki.new({
+      postgres_config = {
         "some_table" => {
           "email" => {
             :type         => :email,
@@ -74,7 +74,9 @@ describe Triki do
         },
         "another_table"      => :truncate,
         "some_table_to_keep" => :keep,
-      }).tap do |my_obfuscator|
+      }
+
+      obfuscator = Triki.new(postgres_config).tap do |my_obfuscator|
         my_obfuscator.database_type = :postgres
       end
 
@@ -150,36 +152,7 @@ describe Triki do
 
         it "raises an error if using postgres with insert statements" do
           expect_raises(RuntimeError) do
-            obfuscator = Triki.new({
-              "some_table" => {
-                "email" => {
-                  :type         => :email,
-                  :skip_regexes => [
-                    /^[\w\.\_]+@honk\.com$/i,
-                    /^dontmurderme@direwolf.com$/,
-                  ],
-                },
-                "name" => {
-                  :type   => :string,
-                  :length => 8,
-                  :chars  => Triki::USERNAME_CHARS,
-                },
-                "age" => {
-                  :type    => :integer,
-                  :between => 10...80,
-                  :unless  => :nil,
-                },
-              },
-              "single_column_table" => {
-                "id" => {
-                  :type    => :integer,
-                  :between => 2..9,
-                  :unless  => :nil,
-                },
-              },
-              "another_table"      => :truncate,
-              "some_table_to_keep" => :keep,
-            }).tap do |my_obfuscator|
+            obfuscator = Triki.new(postgres_config).tap do |my_obfuscator|
               my_obfuscator.database_type = :postgres
             end
 
@@ -269,7 +242,7 @@ describe Triki do
           SQL
         database_dump = IO::Memory.new(string)
 
-        ddo = Triki.new({
+        mysql_config = {
           "some_table" => {
             "email" => {
               :type         => :email,
@@ -300,7 +273,9 @@ describe Triki do
               :type => :null,
             },
           },
-        })
+        }
+
+        ddo = Triki.new(mysql_config)
         output = IO::Memory.new
         ddo.obfuscate(database_dump, output)
         output.rewind
@@ -317,38 +292,7 @@ describe Triki do
 
         it "should ignore tables that it doesn't know about, but should warn" do
           error_output_log = Log.capture("triki") do
-            ddo = Triki.new({
-              "some_table" => {
-                "email" => {
-                  :type         => :email,
-                  :skip_regexes => [
-                    /^[\w\.\_]+@honk\.com$/i,
-                    /^dontmurderme@direwolf.com$/,
-                  ],
-                },
-                "name" => {
-                  :type   => :string,
-                  :length => 8,
-                  :chars  => Triki::USERNAME_CHARS,
-                },
-                "age" => {
-                  :type    => :integer,
-                  :between => 10...80,
-                },
-              },
-              "another_table"      => :truncate,
-              "some_table_to_keep" => :keep,
-              "one_more_table"     => {
-                # Note: fixed strings must be pre-SQL escaped!
-                "password" => {
-                  :type   => :fixed,
-                  :string => "monkey",
-                },
-                "c" => {
-                  :type => :null,
-                },
-              },
-            })
+            ddo = Triki.new(mysql_config)
             output = IO::Memory.new
             database_dump.rewind
             ddo.obfuscate(database_dump, output)
@@ -824,7 +768,7 @@ describe Triki do
         SQL
         database_dump = IO::Memory.new(string)
 
-        ddo = Triki.new({
+        sql_server_config = {
           "some_table" => {
             "email" => {
               :type         => :email,
@@ -855,7 +799,9 @@ describe Triki do
               :type => :null,
             },
           },
-        })
+        }
+
+        ddo = Triki.new(sql_server_config)
         ddo.database_type = :sql_server
 
         output = IO::Memory.new
@@ -875,38 +821,7 @@ describe Triki do
 
         it "should ignore tables that it doesn't know about, but should warn" do
           error_output_log = Log.capture("triki") do
-            ddo = Triki.new({
-              "some_table" => {
-                "email" => {
-                  :type         => :email,
-                  :skip_regexes => [
-                    /^[\w\.\_]+@honk\.com$/i, /^dontmurderme@direwolf.com$/,
-                  ],
-                },
-                "name" => {
-                  :type   => :string,
-                  :length => 8,
-                  :chars  => Triki::USERNAME_CHARS,
-                },
-                "age" => {
-                  :type    => :integer,
-                  :between => 10...80,
-                },
-                "bday" => :keep,
-              },
-              "another_table"      => :truncate,
-              "some_table_to_keep" => :keep,
-              "one_more_table"     => {
-                # Note: fixed strings must be pre-SQL escaped!
-                "password" => {
-                  :type   => :fixed,
-                  :string => "monkey",
-                },
-                "c" => {
-                  :type => :null,
-                },
-              },
-            })
+            ddo = Triki.new(sql_server_config)
             ddo.database_type = :sql_server
 
             output = IO::Memory.new

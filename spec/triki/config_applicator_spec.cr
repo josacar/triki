@@ -6,6 +6,10 @@ alias RowContent = Triki::RowContent
 alias ConfigColumnHash = Triki::ConfigColumnHash
 alias ConfigTableHash = Triki::ConfigTableHash
 
+private def apply(config, row = ["blah", "something_else", "5"], columns = ["a", "b", "c"])
+  Triki::ConfigApplicator.apply_table_config(row, config, columns)
+end
+
 class MyFaker < Triki::Faker
   def self.city
     "Foo O'City"
@@ -53,85 +57,85 @@ describe Triki::ConfigApplicator do
 
     describe "conditional directives" do
       it "should honor :unless conditionals" do
-        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :unless => ->(row : RowAsHash) { row["a"] == "blah" }}}, ["a", "b", "c"])
+        new_row = apply(ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :unless => ->(row : RowAsHash) { row["a"] == "blah" }}})
         new_row[0].should_not eq("123")
         new_row[0].should eq("blah")
 
-        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :unless => ->(row : RowAsHash) { row["a"] == "not blah" }}}, ["a", "b", "c"])
+        new_row = apply(ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :unless => ->(row : RowAsHash) { row["a"] == "not blah" }}})
         new_row[0].should eq("123")
 
-        new_row = Triki::ConfigApplicator.apply_table_config([nil, "something_else", "5"], ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :unless => :nil}, "b" => ConfigColumnHash{:type => :fixed, :string => "123", :unless => :nil}}, ["a", "b", "c"])
+        new_row = apply(ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :unless => :nil}, "b" => ConfigColumnHash{:type => :fixed, :string => "123", :unless => :nil}}, [nil, "something_else", "5"])
         new_row[0].should eq(nil)
         new_row[1].should eq("123")
 
-        new_row = Triki::ConfigApplicator.apply_table_config(["", "something_else", "5"], ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :unless => :blank}, "b" => ConfigColumnHash{:type => :fixed, :string => "123", :unless => :blank}}, ["a", "b", "c"])
+        new_row = apply(ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :unless => :blank}, "b" => ConfigColumnHash{:type => :fixed, :string => "123", :unless => :blank}}, ["", "something_else", "5"])
         new_row[0].should eq("")
         new_row[1].should eq("123")
       end
 
       it "should honor :if conditionals" do
-        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "blah" }}}, ["a", "b", "c"])
+        new_row = apply(ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "blah" }}})
         new_row[0].should eq("123")
 
-        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "not blah" }}}, ["a", "b", "c"])
+        new_row = apply(ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "not blah" }}})
         new_row[0].should_not eq("123")
         new_row[0].should eq("blah")
 
-        new_row = Triki::ConfigApplicator.apply_table_config([nil, "something_else", "5"], ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :if => :nil}, "b" => ConfigColumnHash{:type => :fixed, :string => "123", :if => :nil}}, ["a", "b", "c"])
+        new_row = apply(ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :if => :nil}, "b" => ConfigColumnHash{:type => :fixed, :string => "123", :if => :nil}}, [nil, "something_else", "5"])
         new_row[0].should eq("123")
         new_row[1].should eq("something_else")
 
-        new_row = Triki::ConfigApplicator.apply_table_config(["", "something_else", "5"], ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :if => :blank}, "b" => ConfigColumnHash{:type => :fixed, :string => "123", :if => :blank}}, ["a", "b", "c"])
+        new_row = apply(ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :if => :blank}, "b" => ConfigColumnHash{:type => :fixed, :string => "123", :if => :blank}}, ["", "something_else", "5"])
         new_row[0].should eq("123")
         new_row[1].should eq("something_else")
       end
 
       it "should supply the original row values to the conditional" do
-        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else"], ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123"}, "b" => ConfigColumnHash{:type => :fixed, :string => "yup", :if => ->(row : RowAsHash) { row["a"] == "blah" }}}, ["a", "b"])
+        new_row = apply(ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123"}, "b" => ConfigColumnHash{:type => :fixed, :string => "yup", :if => ->(row : RowAsHash) { row["a"] == "blah" }}}, ["blah", "something_else"], ["a", "b"])
         new_row[0].should eq("123")
         new_row[1].should eq("yup")
       end
 
       it "should honor combined :unless and :if conditionals" do
         # both true
-        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "blah" }, :unless => ->(row : RowAsHash) { row["b"] == "something_else" }}}, ["a", "b", "c"])
+        new_row = apply(ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "blah" }, :unless => ->(row : RowAsHash) { row["b"] == "something_else" }}})
         new_row[0].should eq("blah")
 
         # both false
-        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "not blah" }, :unless => ->(row : RowAsHash) { row["b"] == "not something_else" }}}, ["a", "b", "c"])
+        new_row = apply(ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "not blah" }, :unless => ->(row : RowAsHash) { row["b"] == "not something_else" }}})
         new_row[0].should eq("blah")
 
         # if true, #unless false
-        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "blah" }, :unless => ->(row : RowAsHash) { row["b"] == "not something_else" }}}, ["a", "b", "c"])
+        new_row = apply(ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "blah" }, :unless => ->(row : RowAsHash) { row["b"] == "not something_else" }}})
         new_row[0].should eq("123")
 
         # if false, #unless true
-        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "not blah" }, :unless => ->(row : RowAsHash) { row["b"] == "something_else" }}}, ["a", "b", "c"])
+        new_row = apply(ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :string => "123", :if => ->(row : RowAsHash) { row["a"] == "not blah" }, :unless => ->(row : RowAsHash) { row["b"] == "something_else" }}})
         new_row[0].should eq("blah")
       end
     end
 
     it "should be able to generate random integers in ranges" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"c" => ConfigColumnHash{:type => :integer, :between => 10..100}}, ["a", "b", "c"])
+      new_row = apply(ConfigTableHash{"c" => ConfigColumnHash{:type => :integer, :between => 10..100}})
       new_row.size.should eq(3)
       new_row[2].as(String).to_i.to_s.should eq(new_row[2]) # It should be an integer.
       new_row[2].should_not eq("5")
     end
 
     it "should be able to substitute fixed strings" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"b" => ConfigColumnHash{:type => :fixed, :string => "hello"}}, ["a", "b", "c"])
+      new_row = apply(ConfigTableHash{"b" => ConfigColumnHash{:type => :fixed, :string => "hello"}})
       new_row.size.should eq(3)
       new_row[1].should eq("hello")
     end
 
     it "should be able to substitute a proc that returns a string" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"b" => ConfigColumnHash{:type => :fixed, :string => -> { "Hello World" }}}, ["a", "b", "c"])
+      new_row = apply(ConfigTableHash{"b" => ConfigColumnHash{:type => :fixed, :string => -> { "Hello World" }}})
       new_row.size.should eq(3)
       new_row[1].should eq("Hello World")
     end
 
     it "should provide the row to the proc" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"b" => ConfigColumnHash{:type => :fixed, :string => ->(row : RowAsHash) { row["b"].to_s.as(RowContent) }}}, ["a", "b", "c"])
+      new_row = apply(ConfigTableHash{"b" => ConfigColumnHash{:type => :fixed, :string => ->(row : RowAsHash) { row["b"].to_s.as(RowContent) }}})
       new_row.size.should eq(3)
       new_row[1].should eq("something_else")
     end
@@ -141,7 +145,7 @@ describe Triki::ConfigApplicator do
       original_looking_for = looking_for.dup
       guard = 0
       while !looking_for.empty? && guard < 1000
-        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :one_of => ["hello", "world"]}}, ["a", "b", "c"])
+        new_row = apply(ConfigTableHash{"a" => ConfigColumnHash{:type => :fixed, :one_of => ["hello", "world"]}})
         new_row.size.should eq(3)
         original_looking_for.should contain(new_row[0])
         looking_for.delete new_row[0]
@@ -151,27 +155,27 @@ describe Triki::ConfigApplicator do
     end
 
     it "should treat a symbol in the column definition as an implicit { :type => symbol }" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"b" => :null, "a" => :keep}, ["a", "b", "c"])
+      new_row = apply(ConfigTableHash{"b" => :null, "a" => :keep})
       new_row.size.should eq(3)
       new_row[0].should eq("blah")
       new_row[1].should eq(nil)
     end
 
     it "should be able to set things NULL" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"b" => ConfigColumnHash{:type => :null}}, ["a", "b", "c"])
+      new_row = apply(ConfigTableHash{"b" => ConfigColumnHash{:type => :null}})
       new_row.size.should eq(3)
       new_row[1].should eq(nil)
     end
 
     it "should be able to :keep the value the same" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"b" => ConfigColumnHash{:type => :keep}}, ["a", "b", "c"])
+      new_row = apply(ConfigTableHash{"b" => ConfigColumnHash{:type => :keep}})
       new_row.size.should eq(3)
       new_row[1].should eq("something_else")
     end
 
     it "should keep the value when given an unknown type, but should display a warning" do
       error_output = Log.capture("triki") do
-        new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"b" => ConfigColumnHash{:type => :unknown_type}}, ["a", "b", "c"])
+        new_row = apply(ConfigTableHash{"b" => ConfigColumnHash{:type => :unknown_type}})
         new_row.size.should eq(3)
         new_row[1].should eq("something_else")
       end
@@ -179,7 +183,7 @@ describe Triki::ConfigApplicator do
     end
 
     it "should be able to substitute lorem ipsum text" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"a" => :lorem, "b" => ConfigColumnHash{:type => :lorem, :number => 2}}, ["a", "b", "c"])
+      new_row = apply(ConfigTableHash{"a" => :lorem, "b" => ConfigColumnHash{:type => :lorem, :number => 2}})
       new_row.size.should eq(3)
       new_row[0].should_not eq("blah")
       new_row[0].should_not match(/\w\.(?!\Z)/)
@@ -188,75 +192,75 @@ describe Triki::ConfigApplicator do
     end
 
     it "should be able to generate an :company" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["Smith and Sons", "something_else", "5"], ConfigTableHash{"a" => :company}, ["a", "b", "c"])
+      new_row = apply(ConfigTableHash{"a" => :company}, ["Smith and Sons", "something_else", "5"])
       new_row.size.should eq(3)
       new_row[0].should_not eq("Smith and Sons")
       new_row[0].should match(/\w+/)
     end
 
     it "should be able to generate an :url" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["http://mystuff.blogger.com", "something_else", "5"], ConfigTableHash{"a" => :url}, ["a", "b", "c"])
+      new_row = apply(ConfigTableHash{"a" => :url}, ["http://mystuff.blogger.com", "something_else", "5"])
       new_row.size.should eq(3)
       new_row[0].should_not eq("http://mystuff.blogger.com")
       new_row[0].should match(/http:\/\/\w+/)
     end
 
     it "should be able to generate an :ipv4" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["1.2.3.4", "something_else", "5"], ConfigTableHash{"a" => :ipv4}, ["a", "b", "c"])
+      new_row = apply(ConfigTableHash{"a" => :ipv4}, ["1.2.3.4", "something_else", "5"])
       new_row.size.should eq(3)
       new_row[0].should_not eq("1.2.3.4")
       new_row[0].should match(/\d+\.\d+\.\d+\.\d+/)
     end
 
     it "should be able to generate an :ipv6" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["fe80:0000:0000:0000:0202:b3ff:fe1e:8329", "something_else", "5"], ConfigTableHash{"a" => :ipv6}, ["a", "b", "c"])
+      new_row = apply(ConfigTableHash{"a" => :ipv6}, ["fe80:0000:0000:0000:0202:b3ff:fe1e:8329", "something_else", "5"])
       new_row.size.should eq(3)
       new_row[0].should_not eq("fe80:0000:0000:0000:0202:b3ff:fe1e:8329")
       new_row[0].should match(/[0-9a-f:]+/)
     end
 
     it "should be able to generate an :address" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"a" => :address}, ["a", "b", "c"])
+      new_row = apply(ConfigTableHash{"a" => :address})
       new_row.size.should eq(3)
       new_row[0].should_not eq("blah")
       new_row[0].should match(/\d+ \w/)
     end
 
     it "should be able to generate a :name" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"a" => :name}, ["a", "b", "c"])
+      new_row = apply(ConfigTableHash{"a" => :name})
       new_row.size.should eq(3)
       new_row[0].should_not eq("blah")
       new_row[0].should match(/ /)
     end
 
     it "should be able to generate just a street address" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"a" => :street_address}, ["a", "b", "c"])
+      new_row = apply(ConfigTableHash{"a" => :street_address})
       new_row.size.should eq(3)
       new_row[0].should_not eq("blah")
       new_row[0].should match(/\d+ \w/)
     end
 
     it "should be able to generate a city" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"a" => :city}, ["a", "b", "c"])
+      new_row = apply(ConfigTableHash{"a" => :city})
       new_row.size.should eq(3)
       new_row[0].should_not eq("blah")
     end
 
     it "should be able to generate a state" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"a" => :state}, ["a", "b", "c"])
+      new_row = apply(ConfigTableHash{"a" => :state})
       new_row.size.should eq(3)
       new_row[0].should_not eq("blah")
     end
 
     it "should be able to generate a zip code" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"a" => :zip_code}, ["a", "b", "c"])
+      new_row = apply(ConfigTableHash{"a" => :zip_code})
       new_row.size.should eq(3)
       new_row[0].should_not eq("blah")
       new_row[0].should match(/\d+/)
     end
 
     it "should be able to generate a phone number" do
-      new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else", "5"], ConfigTableHash{"a" => :phone}, ["a", "b", "c"])
+      new_row = apply(ConfigTableHash{"a" => :phone})
       new_row.size.should eq(3)
       new_row[0].should_not eq("blah")
       new_row[0].should match(/\d+/)
