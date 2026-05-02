@@ -18,7 +18,7 @@ class Triki
       context_aware_sql_server_string_split(line)
     end
 
-    def make_valid_value_string(value)
+    def make_valid_value_string(value) : RowContent
       if value.nil?
         "NULL"
       elsif value.is_a?(String) && value.match(/^[A-Z]+\(.*?\)$/)
@@ -28,7 +28,7 @@ class Triki
       end
     end
 
-    def make_insert_statement(table_name, column_names, values, ignore = nil)
+    def make_insert_statement(table_name, column_names, values, ignore = false) : String
       values_strings = values.map do |string_values|
         "(" + string_values.join(",") + ")"
       end.join(",")

@@ -78,11 +78,11 @@ class Triki
       )
     end
 
-    def make_insert_statement(table_name, column_names, values, ignore = nil)
+    def make_insert_statement(table_name, column_names, values, ignore = false) : String
       values.flatten.join('\t')
     end
 
-    def make_valid_value_string(value)
+    def make_valid_value_string(value) : RowContent
       if value.nil?
         "\\N"
       else

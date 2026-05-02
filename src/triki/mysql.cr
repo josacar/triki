@@ -21,10 +21,10 @@ class Triki
       )
     end
 
-    def make_insert_statement(table_name, column_names, rows, ignore = false)
+    def make_insert_statement(table_name, column_names, values, ignore = false) : String
       String.build do |buffer|
         buffer << %{INSERT #{ignore ? "IGNORE " : ""}INTO `#{table_name}` (`#{column_names.join("`, `")}`) VALUES }
-        write_rows(buffer, rows)
+        write_rows(buffer, values)
         buffer << ";"
       end
     end
@@ -83,7 +83,7 @@ class Triki
       rows
     end
 
-    def make_valid_value_string(value)
+    def make_valid_value_string(value) : RowContent
       if value.nil?
         "NULL"
       elsif value =~ /^0x[0-9a-fA-F]+$/
