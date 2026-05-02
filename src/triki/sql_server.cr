@@ -13,8 +13,7 @@ class Triki
       )
     end
 
-    def rows_to_be_inserted(line)
-      Array(Array(String?))
+    def rows_to_be_inserted(line) : Array(Array(String?))
       line = line.gsub(insert_regex, "").gsub(/\s*;?\s*$/, "").gsub(/^\(/, "").gsub(/\)$/, "")
       context_aware_sql_server_string_split(line)
     end
