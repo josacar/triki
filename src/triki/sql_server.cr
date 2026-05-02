@@ -28,7 +28,7 @@ class Triki
       end
     end
 
-    def make_insert_statement(table_name, column_names, values, ignore = false) : String
+    def make_insert_statement(table_name, column_names, values, _ignore = false) : String
       values_strings = values.map do |string_values|
         "(" + string_values.join(",") + ")"
       end.join(",")
