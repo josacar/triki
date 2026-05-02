@@ -51,6 +51,8 @@ spec/
     ├── mysql_spec.cr
     ├── postgres_spec.cr
     └── sql_server_spec.cr
+
+IMPROVEMENTS.md                     # Living audit of bugs, duplication, and style issues
 ```
 
 ## Architecture
@@ -89,6 +91,7 @@ Column actions include: `:email`, `:name`, `:first_name`, `:last_name`, `:addres
 - **Ameba linter** – config in `.ameba.yml` (GuardClause enabled)
 - **Indentation**: 2 spaces (see `.editorconfig`)
 - **Naming**: `snake_case` for methods/variables, `PascalCase` for types
+- **Error raising**: Use `raise RuntimeError.new("descriptive message")` consistently — avoid bare `raise "string"` or `raise RuntimeError.new` without a message
 
 ### Testing
 
@@ -96,6 +99,8 @@ Column actions include: `:email`, `:name`, `:first_name`, `:last_name`, `:addres
 - Specs live in `spec/`
 - Use `Log.capture("triki")` to test log output
 - Use `expect_raises(RuntimeError)` for error expectations
+- Avoid duplicating large config hashes across nested contexts — extract shared configs to variables in the parent `describe`/`context` block
+- For repetitive spec calls, define a file-private helper (e.g., `spec/triki/config_applicator_spec.cr` uses a top-level `apply` method to wrap `ConfigApplicator.apply_table_config` with default row/columns)
 
 ### Type Aliases
 
@@ -130,6 +135,10 @@ The main `Triki` class defines many type aliases (`RowAsHash`, `ConfigColumn`, e
 - **walker_method** – Helper for walking/traversing structures
 - **faker** – Fake data generation (names, emails, addresses, etc.)
 - **ameba** (dev) – Static analysis / linting
+
+## Known Issues & Improvements
+
+See `IMPROVEMENTS.md` for a living audit of remaining bugs, code duplication, missing type annotations, and style inconsistencies. Update it when issues are resolved.
 
 ## CI/CD
 
