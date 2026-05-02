@@ -14,8 +14,10 @@ class Triki
     end
 
     def rows_to_be_inserted(line) : Array(Array(String?))
-      line = line.gsub(insert_regex, "").gsub(/\s*;?\s*$/, "").gsub(/^\(/, "").gsub(/\)$/, "")
-      context_aware_sql_server_string_split(line)
+      match = insert_regex.match(line)
+      values_str = match.try(&.post_match) || line
+      values_str = values_str.lstrip('(').rstrip("; \t\n").sub(/\)$/, "")
+      context_aware_sql_server_string_split(values_str)
     end
 
     def make_valid_value_string(value) : RowContent

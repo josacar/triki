@@ -65,7 +65,7 @@ class Triki
           rows.push(row_values)
         elsif scanner.scan(/NULL/)
           row_values << nil
-        elsif match = scanner.scan(/'(\\\\|\\'|.)*?'/)
+        elsif match = scanner.scan(/'(?:[^'\\]|\\.)*'/)
           # We drop the leading and trailing quotes to extract the string
           row_values << match[1, match.size - 2]
         elsif match = scanner.scan(/[^,\)]+/)
