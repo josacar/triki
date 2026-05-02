@@ -146,7 +146,7 @@ class Triki
               when .is_a?(Range)
                 length_or_range
               else
-                raise "ERROR: 'length' or 'range' es not an Integer or a Range"
+                raise "ERROR: 'length' or 'range' is not an Integer or a Range"
               end
 
       times = random_integer(range)

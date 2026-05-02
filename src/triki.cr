@@ -1,7 +1,7 @@
 require "log"
 
-# Class for obfuscating MySQL dumps. This can parse mysqldump outputs when using the -c option, which includes
-# column names in the insert statements.
+# Class for obfuscating MySQL, PostgreSQL, and SQL Server dumps. This can parse mysqldump outputs
+# when using the -c option, which includes column names in the insert statements.
 class Triki
   property config, globally_kept_columns = Array(String).new, database_type = :mysql, scaffolded_tables, faker
   property? fail_on_unspecified_columns = false
