@@ -131,7 +131,7 @@ class Triki
       elsif conditional_method == :nil
         Proc(RowAsHash, Bool).new { row[index].nil? }
       else
-        raise RuntimeError.new
+        raise RuntimeError.new("Unknown conditional method: #{conditional_method}. Supported values are :blank, :nil, or a Proc.")
       end
     end
 
