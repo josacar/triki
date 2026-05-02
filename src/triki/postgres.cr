@@ -28,7 +28,7 @@ class Triki
           current_columns = table_data[:column_names]
 
           if !config[current_table_name]
-            Log.warn { "Deprecated: #{current_table_name} was not specified in the config.  A future release will cause this to be an error.  Please specify the table definition or set it to :keep." }
+            Log.warn { "Deprecated: #{current_table_name} #{DEPRECATION_WARNING}" }
           end
 
           output_io.print(line)

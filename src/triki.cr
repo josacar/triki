@@ -12,6 +12,8 @@ class Triki
   USERNAME_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_" + NUMBER_CHARS
   SENSIBLE_CHARS = USERNAME_CHARS + "+-=[{]}/?|!@#$%^&*()`~"
 
+  DEPRECATION_WARNING = "was not specified in the config. A future release will cause this to be an error. Please specify the table definition or set it to :keep."
+
   Log = begin
     backend = ::Log::IOBackend.new(STDERR)
     ::Log.builder.bind("*", :warn, backend)
