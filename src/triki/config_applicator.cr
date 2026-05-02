@@ -16,7 +16,7 @@ class Triki
 
       table_config.each do |column, definition|
         index = columns.index(column)
-        raise "ERROR: Column #{column} does not exist" unless index
+        raise RuntimeError.new("ERROR: Column #{column} does not exist") unless index
 
         definition = {:type => definition} if definition.is_a?(Symbol)
 
@@ -27,7 +27,7 @@ class Triki
         chars = definition[:chars]?
 
         if unless_definition = definition[:unless]?
-          raise "ERROR: 'unless' definition does not return Bool or Symbol" unless unless_definition.is_a?(BoolProc | Symbol)
+          raise RuntimeError.new("ERROR: 'unless' definition does not return Bool or Symbol") unless unless_definition.is_a?(BoolProc | Symbol)
 
           unless_check = make_conditional_method(unless_definition, index, row)
 
@@ -35,7 +35,7 @@ class Triki
         end
 
         if if_definition = definition[:if]?
-          raise "ERROR: 'if' definition does not return Bool or Symbol" unless if_definition.is_a?(BoolProc | Symbol)
+          raise RuntimeError.new("ERROR: 'if' definition does not return Bool or Symbol") unless if_definition.is_a?(BoolProc | Symbol)
 
           if_check = make_conditional_method(if_definition, index, row)
 
@@ -146,7 +146,7 @@ class Triki
               when .is_a?(Range)
                 length_or_range
               else
-                raise "ERROR: 'length' or 'range' is not an Integer or a Range"
+                raise RuntimeError.new("ERROR: 'length' or 'range' is not an Integer or a Range")
               end
 
       times = random_integer(range)
