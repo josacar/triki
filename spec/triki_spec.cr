@@ -2,7 +2,7 @@ require "./spec_helper"
 require "log/spec"
 
 describe Triki do
-  describe "Triki.reassembling_each_insert" do
+  describe "Triki.reassemble_each_insert" do
     it "should yield each subinsert and reassemble the result" do
       column_names = ["a", "b", "c", "d"]
       test_insert = "INSERT INTO `some_table` (`a`, `b`, `c`, `d`) VALUES ('(\\'bob@bob.com','b()ob','some(thingelse1','25)('),('joe@joe.com','joe','somethingelse2','54');"
@@ -12,7 +12,7 @@ describe Triki do
       ]
 
       count = 0
-      reassembled = Triki.new.reassembling_each_insert(test_insert, "some_table", column_names) do |sub_insert|
+      reassembled = Triki.new.reassemble_each_insert(test_insert, "some_table", column_names) do |sub_insert|
         sub_insert.should eq(test_insert_passes.shift)
         count += 1
         sub_insert

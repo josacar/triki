@@ -8,8 +8,8 @@ class Triki
 
   @faker = Faker
 
-  NUMBER_CHARS   = "1234567890"
-  USERNAME_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_" + NUMBER_CHARS
+  DIGIT_CHARS    = "1234567890"
+  USERNAME_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_" + DIGIT_CHARS
   SENSIBLE_CHARS = USERNAME_CHARS + "+-=[{]}/?|!@#$%^&*()`~"
 
   DEFAULT_INTEGER_RANGE  = 0..1000
@@ -90,7 +90,7 @@ class Triki
     database_helper.generate_config(self, config, input_io, output_io)
   end
 
-  def reassembling_each_insert(line : String, table_name : String, columns, ignore = false, &)
+  def reassemble_each_insert(line : String, table_name : String, columns, ignore = false, &)
     output = database_helper.rows_to_be_inserted(line).map do |sub_insert|
       result = yield(sub_insert)
       result.map do |i|
@@ -147,7 +147,7 @@ class Triki
       check_for_defined_columns_not_in_table(table_name, columns)
       check_for_table_columns_not_in_definition(table_name, columns) if fail_on_unspecified_columns?
       # Note: Remember to SQL escape strings in what you pass back.
-      reassembling_each_insert(line, table_name, columns, ignore) do |row|
+      reassemble_each_insert(line, table_name, columns, ignore) do |row|
         ConfigApplicator.apply_table_config(row: row, table_config: table_config, columns: columns, faker: @faker)
       end
     end

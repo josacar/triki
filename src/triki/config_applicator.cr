@@ -11,8 +11,8 @@ class Triki
 
       row_hash = row_as_hash(row, columns)
 
-      my_row = Row.new
-      my_row += row
+      transformed_row = Row.new
+      transformed_row += row
 
       table_config.each do |column, definition|
         index = columns.index(column)
@@ -46,7 +46,7 @@ class Triki
           next if skip_regexes.any? { |regex| row[index] =~ regex }
         end
 
-        my_row[index] = case definition[:type]
+        transformed_row[index] = case definition[:type]
                         when :email
                           md5 = Digest::MD5.hexdigest(rand.to_s)[0...5]
                           clean_quotes("#{faker.email}.#{md5}.example.com")
@@ -111,7 +111,7 @@ class Triki
                           row[index]?
                         end
       end
-      my_row
+      transformed_row
     end
 
     def self.row_as_hash(row : Array, columns : Array) : RowAsHash
