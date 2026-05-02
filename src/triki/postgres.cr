@@ -56,7 +56,7 @@ class Triki
       row = line.split(/\t/)
 
       last = row.size - 1
-      row[last] = row[last].strip
+      row[last] = row[last].strip if last >= 0
 
       row = row.map do |value|
         if value == "\\N"

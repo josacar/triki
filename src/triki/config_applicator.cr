@@ -11,8 +11,7 @@ class Triki
 
       row_hash = row_as_hash(row, columns)
 
-      transformed_row = Row.new
-      transformed_row += row
+      transformed_row = row.map { |v| v.as(RowContent) }
 
       table_config.each do |column, definition|
         index = columns.index(column)
