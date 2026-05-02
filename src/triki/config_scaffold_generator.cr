@@ -53,7 +53,7 @@ class Triki
       %(\n  "#{table_name}" => {)
     end
 
-    def config_table_close(table_name)
+    def config_table_close
       "  },"
     end
 
@@ -80,7 +80,7 @@ class Triki
         formatted_line(column, "keep", "# scaffold")
       end.join("\n").chomp(',')
       output_io.puts scaffold
-      output_io.print config_table_close(table_name)
+      output_io.print config_table_close
     end
 
     def formatted_line(column, definition, comment = nil)
