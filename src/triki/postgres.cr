@@ -78,7 +78,7 @@ class Triki
       )
     end
 
-    def make_insert_statement(table_name, column_names, values, _ignore = false) : String
+    def make_insert_statement(table_name, column_names, values, ignore = false) : String
       values.flatten.join('\t')
     end
 
