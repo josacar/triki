@@ -285,6 +285,26 @@ describe Triki::ConfigApplicator do
     end
   end
 
+  describe ".random_integer" do
+    it "produces values inside the given range" do
+      100.times do
+        value = Triki::ConfigApplicator.random_integer(10..20)
+        value.should be >= 10
+        value.should be <= 20
+      end
+    end
+  end
+
+  describe ".random_string" do
+    it "uses only characters from the supplied alphabet" do
+      alphabet = "abc"
+      50.times do
+        str = Triki::ConfigApplicator.random_string(10, alphabet)
+        str.each_char { |char| alphabet.should contain(char) }
+      end
+    end
+  end
+
   describe ".random_english_sentences" do
     it "should only load file data once" do
       Triki::EnglishDictionary.random_sentences(1)
@@ -303,6 +323,15 @@ describe Triki::ConfigApplicator do
       sentences = text.scan(sentence).map(&.[0])
 
       sentences[0].should_not eq(sentences[1])
+    end
+
+    it "produces sentences with 3 to 7 words" do
+      20.times do
+        text = Triki::EnglishDictionary.random_sentences(1)
+        word_count = text.split.size
+        word_count.should be >= 3
+        word_count.should be <= 7
+      end
     end
   end
 end

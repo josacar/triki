@@ -173,6 +173,21 @@ describe Triki do
         scaffold_output_string.should_not match(/"age"\s+=>\s+:keep.+scaffold/)
       end
 
+      context "when all tables are :keep or :truncate" do
+        it "does not crash on an empty buffer" do
+          keep_dump = IO::Memory.new(<<-SQL)
+            COPY some_table (id, email) FROM stdin;
+            1	hello
+            .
+            SQL
+          keeper = Triki.new({"some_table" => :keep})
+          output = IO::Memory.new
+          keeper.scaffold(keep_dump, output)
+          output.rewind
+          output.gets_to_end.should be_empty
+        end
+      end
+
       context "when dump contains a '.' at the end of the line" do
         dump = IO::Memory.new(<<-'SQL')
             COPY another_table (a, b, c, d) FROM stdin;
@@ -388,6 +403,10 @@ describe Triki do
         it "should accept columns defined in globally_kept_columns" do
           ddo.globally_kept_columns = %w[something]
           ddo.obfuscate(database_dump, IO::Memory.new)
+        end
+
+        it "exposes a boolean getter for fail_on_unspecified_columns" do
+          ddo.fail_on_unspecified_columns?.should be_true
         end
       end
 
