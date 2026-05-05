@@ -45,7 +45,7 @@ class Triki
       end
 
       buffer.seek(-1, IO::Seek::Current)
-      buffer.puts("\0")
+      buffer.puts
       buffer.to_s(output_io)
     end
 
@@ -84,8 +84,11 @@ class Triki
     end
 
     def formatted_line(column : String, definition : ConfigColumn | String, comment : String? = nil) : String
-      colon_string = if definition.to_s[0] == '{' || definition.to_s[0] == ':'
+      colon_string = case definition
+                     when Hash
                        definition.to_s
+                     when String
+                       definition.starts_with?(':') ? definition : ":#{definition}"
                      else
                        ":#{definition}"
                      end

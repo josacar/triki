@@ -44,7 +44,7 @@ describe Triki::ConfigApplicator do
       100.times do
         new_row = Triki::ConfigApplicator.apply_table_config(["blah", "something_else"], ConfigTableHash{"a" => ConfigColumnHash{:type => :email}}, ["a", "b"])
         new_row.size.should eq(2)
-        new_row.first.should match(/^[\w\.]+\@(\w+\.){2,3}[a-f0-9]{5}\.example\.com$/)
+        new_row.first.should match(/^[\w\.]+\@(\w+\.){2,3}[a-f0-9]{10}\.example\.com$/)
       end
     end
 

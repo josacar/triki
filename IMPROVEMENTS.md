@@ -102,13 +102,13 @@ Standardize on `raise RuntimeError.new("descriptive message")`.
 1. **`insert_regex` is `private` in both MySQL and SqlServer** — already correct.
 2. **Log references unified to `Log.warn`** across all files (`0ce59ea`).
 
-## Naming Improvements
+## ~~Naming Improvements~~ — **FIXED**
 
 | Current | Suggested | Reason |
 |---------|-----------|--------|
-| `NUMBER_CHARS` | `DIGIT_CHARS` | Contains only digits, no decimal/sign |
-| `my_row` (config_applicator:14) | `transformed_row` | Meaningless name |
-| `reassembling_each_insert` | `reassemble_each_insert` | Awkward grammar (gerund) |
+| `NUMBER_CHARS` → `DIGIT_CHARS` | Contains only digits, no decimal/sign |
+| `my_row` → `transformed_row` | Meaningless name |
+| `reassembling_each_insert` → `reassemble_each_insert` | Awkward grammar (gerund) |
 
 ## Performance
 
@@ -129,8 +129,8 @@ This avoids allocating four intermediate strings.
 ## Minor
 
 - ~~**`config_applicator.cr:14-15`**~~: `transformed_row = row.map { |v| v.as(RowContent) }` — **FIXED**
-- **`triki.cr:28`**: Log binding `"*"` captures ALL log sources, not just `"triki"`. Should bind `"triki"` to avoid interference from dependency logs.
-- **`config_scaffold_generator.cr:48`**: Writes `\0` (null byte) to output — unusual for text config files.
-- **`config_scaffold_generator.cr:87-91`**: Type detection via `definition.to_s[0]` is fragile. A proper `case`/`is_a?` check would be more robust.
+- **`triki.cr:28`**: ~~Log binding `"*"` captures ALL log sources~~ → changed to `"triki"`. **FIXED**
+- **`config_scaffold_generator.cr:48`**: ~~Writes `\0` (null byte) to output~~ → removed, now writes plain newline. **FIXED**
+- **`config_scaffold_generator.cr:87-91`**: ~~Type detection via `definition.to_s[0]` is fragile~~ → replaced with `case`/`is_a?` check. **FIXED**
 - ~~**`postgres.cr:59`**~~: `row[last] = row[last].strip if last >= 0` — guard already present. **FIXED**
-- **`config_applicator.cr:50`**: Uses `Digest::MD5` and truncates to 5 hex chars — low entropy for email generation.
+- **`config_applicator.cr:50`**: ~~`Digest::MD5` truncated to 5 hex chars~~ → `Digest::SHA256` with 10 hex chars. **FIXED**

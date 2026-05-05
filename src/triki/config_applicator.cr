@@ -1,4 +1,4 @@
-require "digest/md5"
+require "digest/sha256"
 
 class Triki
   module ConfigApplicator
@@ -47,7 +47,7 @@ class Triki
 
         transformed_row[index] = case definition[:type]
                                  when :email
-                                   hashed = Digest::MD5.hexdigest(row[index].to_s)[0...5]
+                                   hashed = Digest::SHA256.hexdigest(row[index].to_s)[0...10]
                                    clean_quotes("#{faker.email}.#{hashed}.example.com")
                                  when :string
                                    random_string(length || DEFAULT_STRING_LENGTH, chars.as(String | Nil) || SENSIBLE_CHARS) if length.is_a?(Int32)
