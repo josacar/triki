@@ -89,18 +89,18 @@ Added explicit parameter and return types across the codebase. All abstract meth
 
 Standardize on `raise RuntimeError.new("descriptive message")`.
 
-## Inconsistent Patterns Between Database Helpers
+## ~~Inconsistent Patterns Between Database Helpers~~ — **FIXED**
 
 | Aspect | MySQL | Postgres | SqlServer |
 |--------|-------|----------|-----------|
-| `insert_regex` visibility | Public (`:48`) | N/A (inline) | Private (`:40`) — correct |
+| `insert_regex` visibility | ~~Public~~ → `private` | N/A (inline) | `private` |
 | `make_valid_value_string` quoting | `'value'` | raw (tab-sep) | `N'value'` |
 | `make_insert_statement` `ignore` | Used | Unused | Unused |
 | `parse_insert_statement` contract | Returns `Table` | Returns `MatchData`/nil | Returns `Table` |
-| Log reference | `Triki::Log` (via mixin) | `Log` (unqualified) | `Triki::Log` (via mixin) |
+| Log reference | ~~`Triki::Log`~~ → `Log` | ~~`Log` (unqualified)~~ → `Log` | ~~`Triki::Log`~~ → `Log` |
 
-1. **Make `insert_regex` private everywhere** — it's an implementation detail.
-2. **~~Align `Log` references~~** — unified to `Log.warn` across all files (`0ce59ea`).
+1. **`insert_regex` is `private` in both MySQL and SqlServer** — already correct.
+2. **Log references unified to `Log.warn`** across all files (`0ce59ea`).
 
 ## Naming Improvements
 
@@ -112,25 +112,25 @@ Standardize on `raise RuntimeError.new("descriptive message")`.
 
 ## Performance
 
-### REGEX-1: MySQL string parser backtracking risk
-`src/triki/mysql.cr:68`:
+### ~~REGEX-1~~: MySQL string parser backtracking risk — **FIXED**
+`src/triki/mysql.cr:68` now uses a character-class-based regex:
 ```crystal
-scanner.scan(/'(\\\\|\\'|.)*?'/)
+scanner.scan(/'(?:[^'\\]|\\.)*'/)
 ```
-The `(\\\\|\\'|.)*?` pattern with `.` alternation and lazy quantifier can cause catastrophic backtracking on malformed or long strings. A character-class-based approach would be safer.
+This eliminates the `.` alternation that caused catastrophic backtracking risk.
 
-### REGEX-2: SqlServer `rows_to_be_inserted` uses 4 chained `gsub` calls
-`src/triki/sql_server.cr:18` — Four sequential `gsub`s, each allocating a new string:
+### ~~REGEX-2~~: SqlServer `rows_to_be_inserted` uses 4 chained `gsub` calls — **FIXED**
+`src/triki/sql_server.cr:18` now uses `lstrip`/`rstrip`/`sub` instead of four sequential `gsub`s:
 ```crystal
-line.gsub(insert_regex, "").gsub(/\s*;?\s*$/, "").gsub(/^\(/, "").gsub(/\)$/, "")
+values_str = values_str.lstrip('(').rstrip("; \t\n").sub(/\)$/, "")
 ```
-Could be combined or use `StringScanner` (like MySQL does).
+This avoids allocating four intermediate strings.
 
 ## Minor
 
-- **`config_applicator.cr:14-15`**: `my_row = Row.new; my_row += row` is equivalent to `row.dup`. The current form is verbose and unclear.
-- **`triki.cr:17`**: Log binding `"*"` captures ALL log sources, not just `"triki"`. Should bind `"triki"` to avoid interference from dependency logs.
+- ~~**`config_applicator.cr:14-15`**~~: `transformed_row = row.map { |v| v.as(RowContent) }` — **FIXED**
+- **`triki.cr:28`**: Log binding `"*"` captures ALL log sources, not just `"triki"`. Should bind `"triki"` to avoid interference from dependency logs.
 - **`config_scaffold_generator.cr:48`**: Writes `\0` (null byte) to output — unusual for text config files.
 - **`config_scaffold_generator.cr:87-91`**: Type detection via `definition.to_s[0]` is fragile. A proper `case`/`is_a?` check would be more robust.
-- **`postgres.cr:59`**: `row[last] = row[last].strip` — potential `IndexError` if row is empty.
-- **`config_applicator.cr:51`**: Uses `Digest::MD5` and truncates to 5 hex chars — low entropy for email generation.
+- ~~**`postgres.cr:59`**~~: `row[last] = row[last].strip if last >= 0` — guard already present. **FIXED**
+- **`config_applicator.cr:50`**: Uses `Digest::MD5` and truncates to 5 hex chars — low entropy for email generation.

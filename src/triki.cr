@@ -25,7 +25,7 @@ class Triki
 
   Log = begin
     backend = ::Log::IOBackend.new(STDERR)
-    ::Log.builder.bind("*", :warn, backend)
+    ::Log.builder.bind("triki", :warn, backend)
     ::Log.for(self)
   end
 
