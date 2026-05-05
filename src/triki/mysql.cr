@@ -1,6 +1,9 @@
 require "string_scanner"
 
 class Triki
+  # MySQL dump parser and writer.
+  #
+  # Handles `INSERT` and `INSERT IGNORE` statements produced by `mysqldump -c`.
   struct Mysql < Base
     alias Field = String?
     alias Fields = Array(Field)

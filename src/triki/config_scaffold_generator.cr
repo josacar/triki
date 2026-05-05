@@ -1,4 +1,8 @@
 class Triki
+  # Generates a configuration scaffold from an SQL dump.
+  #
+  # Included by all database helpers. Outputs placeholder `:keep` rules
+  # for every table and column found in the dump.
   module ConfigScaffoldGenerator
     macro included
       def table_data(line)
@@ -10,6 +14,7 @@ class Triki
       end
     end
 
+    # Reads the dump and writes a scaffold config to *output_io*.
     def generate_config(obfuscator : Triki, config : ConfigHash, input_io : IO, output_io : IO)
       buffer = IO::Memory.new
 

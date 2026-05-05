@@ -1,10 +1,20 @@
 require "digest/sha256"
 
 class Triki
+  # Applies per-column obfuscation rules to a single row of data.
   module ConfigApplicator
     alias RowAsHash = Triki::RowAsHash
     alias RowContent = Triki::RowContent
 
+    # Applies the obfuscation configuration for a single table row.
+    #
+    # *row* — raw values extracted from the INSERT/COPY statement.
+    # *table_config* — column-level rules (e.g. `:email`, `:name`, `:string`).
+    # *columns* — ordered list of column names for this table.
+    # *faker* — generator for fake data (defaults to `Triki::Faker`).
+    # *dictionary* — word source for `:like_english` (defaults to `EnglishDictionary`).
+    #
+    # Returns the transformed row with sensitive data replaced.
     # ameba:disable Metrics/CyclomaticComplexity
     def self.apply_table_config(row : Array(String?), table_config : Triki::ConfigTableHash, columns : ColumnList, faker = Faker, dictionary = EnglishDictionary)
       row_hash = row_as_hash(row, columns)

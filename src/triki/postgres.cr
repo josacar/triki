@@ -1,4 +1,7 @@
 class Triki
+  # PostgreSQL dump parser and writer.
+  #
+  # Handles `COPY ... FROM stdin` statements produced by `pg_dump`.
   struct Postgres < Base
     alias Table = NamedTuple(table_name: String, column_names: ColumnList)
     include Triki::ConfigScaffoldGenerator

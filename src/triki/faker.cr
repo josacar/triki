@@ -1,6 +1,10 @@
 require "faker"
 
 class Triki
+  # Abstract interface for fake data generators.
+  #
+  # Concrete implementations supply values for obfuscation types such as
+  # `:email`, `:name`, `:address`, `:phone`, etc.
   abstract class FakerInterface
     module ClassMethods
       abstract def email
@@ -24,6 +28,7 @@ class Triki
     end
   end
 
+  # Default fake data generator. Delegates to the `faker` shard.
   class Faker < FakerInterface
     def self.email
       ::Faker::Internet.email

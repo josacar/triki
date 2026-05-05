@@ -1,7 +1,11 @@
 require "log"
 
-# Class for obfuscating MySQL, PostgreSQL, and SQL Server dumps. This can parse mysqldump outputs
-# when using the -c option, which includes column names in the insert statements.
+# Standalone Crystal library for the selective rewriting (obfuscation/anonymization)
+# of SQL dumps to protect user privacy.
+#
+# Supports MySQL, PostgreSQL, and SQL Server dump formats.
+# Parse mysqldump outputs when using the `-c` option, which includes
+# column names in the INSERT statements.
 class Triki
   property config : ConfigHash
   property globally_kept_columns = Array(String).new
@@ -59,8 +63,12 @@ class Triki
   alias ConfigTable = ConfigTableHash | TruncateOrKeepTable
   alias ConfigHash = Hash(TableName, ConfigTable)
 
-  # Make a new Triki object.  Pass in a configuration structure to define how the obfuscation should be
-  # performed.  See the README.rdoc file for more information.
+  # Creates a new Triki obfuscator with the given configuration.
+  #
+  # The configuration is a hash mapping table names to either:
+  # - `:truncate` — remove all rows
+  # - `:keep` — pass through unchanged
+  # - A `Hash(String, ConfigColumn)` — per-column obfuscation rules
   def initialize(configuration = ConfigHash.new)
     @config = ConfigParser.cast_bindings(configuration)
     @scaffolded_tables = {} of String => Int32
@@ -77,14 +85,18 @@ class Triki
                          end
   end
 
-  # Read an input stream and dump out an obfuscated output stream.  These streams could be any class implementing IO abstract class.
-  # or STDIN and STDOUT.
+  # Reads an input stream and writes an obfuscated output stream.
+  #
+  # `input_io` — SQL dump to process (e.g. STDIN or File).
+  # `output_io` — destination for the rewritten dump (e.g. STDOUT or File).
   def obfuscate(input_io : IO, output_io : IO) : Nil
     database_helper.parse(self, config, input_io, output_io)
   end
 
-  # Read an input stream and dump out a config file scaffold.  These streams could be any class implementing IO abstract class.
-  # or STDIN and STDOUT.
+  # Reads an input stream and writes a configuration scaffold to the output stream.
+  #
+  # The scaffold lists every table and column found in the dump with
+  # placeholder `:keep` rules, making it easy to build an obfuscation config.
   def scaffold(input_io : IO, output_io : IO) : Nil
     database_helper.generate_config(self, config, input_io, output_io)
   end

@@ -1,4 +1,7 @@
 class Triki
+  # SQL Server dump parser and writer.
+  #
+  # Handles `INSERT INTO [dbo].[table] ... VALUES` statements.
   struct SqlServer < Base
     alias Table = NamedTuple(table_name: String, column_names: ColumnList)
     include Triki::InsertStatementParser

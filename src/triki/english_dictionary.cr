@@ -1,6 +1,7 @@
 require "walker_method"
 
 class Triki
+  # Abstract interface for text generators used by the `:like_english` type.
   abstract class DictionaryInterface
     module ClassMethods
       abstract def random_sentences(num : Int32)
@@ -11,6 +12,7 @@ class Triki
     end
   end
 
+  # Generates random English-like sentences using a word-frequency list.
   class EnglishDictionary < DictionaryInterface
     def self.random_sentences(num : Int32)
       sentences = Array(String).new
