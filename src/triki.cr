@@ -66,10 +66,6 @@ class Triki
     @scaffolded_tables = {} of String => Int32
   end
 
-  def fail_on_unspecified_columns?
-    @fail_on_unspecified_columns
-  end
-
   def database_helper : Base
     @database_helper ||= case @database_type
                          when :sql_server

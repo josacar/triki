@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require "string_scanner"
 
 class Triki
