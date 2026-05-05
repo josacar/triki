@@ -88,7 +88,7 @@ class Triki
       elsif value =~ /^0x[0-9a-fA-F]+$/
         value
       else
-        "'" + value.to_s + "'"
+        "'#{value}'"
       end
     end
   end

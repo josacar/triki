@@ -14,7 +14,7 @@ class Triki
     # column names) across multiple lines.
     #
     def parse(obfuscator : Triki, config : ConfigHash, input_io : IO, output_io : IO) : Nil
-      current_table_name = String.new
+      current_table_name = ""
       current_columns = ColumnList.new
       inside_copy_statement = false
 

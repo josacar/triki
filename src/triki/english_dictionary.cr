@@ -16,7 +16,7 @@ class Triki
       sentences = Array(String).new
       num.times do
         words = Array(String).new
-        (3 + rand * 5).to_i.times { words << walker_method.random }
+        rand(3..7).times { words << walker_method.random }
         sentence = words.join(" ") + "."
         sentences << sentence.capitalize
       end

@@ -133,7 +133,7 @@ class Triki
     end
 
     def self.random_integer(between : IntRange) : Int32
-      (between.min + (between.max - between.min) * rand).round.to_i
+      rand(between)
     end
 
     def self.random_string(length_or_range : Int32 | IntRange, chars : String) : String
@@ -147,11 +147,9 @@ class Triki
               end
 
       times = random_integer(range)
-      random_string = ""
-      times.times do
-        random_string += chars[(rand * chars.size).to_i]
+      String.build do |buffer|
+        times.times { buffer << chars[rand(chars.size)] }
       end
-      random_string
     end
 
     def self.clean_quotes(value : String) : String
