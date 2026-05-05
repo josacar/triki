@@ -61,7 +61,7 @@ describe Triki::Postgres do
 
   describe "#make_insert_statement" do
     it "creates a string with tab delminted" do
-      subject.make_insert_statement("some_table", ["id", "name"], ["1", "2"]).should eq("1	2")
+      subject.make_insert_statement("some_table", ["id", "name"], [["1", "2"]]).should eq("1\t2")
     end
   end
 end

@@ -13,7 +13,7 @@ class Triki
     # This requires the parse methods to persist data (table name and
     # column names) across multiple lines.
     #
-    def parse(obfuscator, config, input_io, output_io)
+    def parse(obfuscator : Triki, config : ConfigHash, input_io : IO, output_io : IO) : Nil
       current_table_name = String.new
       current_columns = ColumnList.new
       inside_copy_statement = false
@@ -52,7 +52,7 @@ class Triki
     #
     # We wrap it in an array to keep it consistent with MySql bulk
     # obfuscation (multiple rows per insert statement)
-    def rows_to_be_inserted(line) : Array(Array(String?))
+    def rows_to_be_inserted(line : String) : Array(Array(String?))
       row = line.split(/\t/)
 
       last = row.size - 1
@@ -69,7 +69,7 @@ class Triki
       [row]
     end
 
-    def parse_copy_statement(line)
+    def parse_copy_statement(line : String) : Table?
       return unless regex_match = /^\s*COPY (.*?) \((.*?)\) FROM\s*/i.match(line)
 
       Table.new(
@@ -78,11 +78,11 @@ class Triki
       )
     end
 
-    def make_insert_statement(table_name, column_names, values, ignore = false) : String
+    def make_insert_statement(table_name : String, column_names : ColumnList, values : Array(Array(RowContent)), ignore = false) : String
       values.flatten.join('\t')
     end
 
-    def make_valid_value_string(value) : RowContent
+    def make_valid_value_string(value : RowContent) : RowContent
       if value.nil?
         "\\N"
       else
@@ -90,7 +90,7 @@ class Triki
       end
     end
 
-    def parse_insert_statement(line)
+    def parse_insert_statement(line : String) : Regex::MatchData?
       /^\s*INSERT INTO/i.match(line)
     end
   end

@@ -1,6 +1,6 @@
 class Triki
   module InsertStatementParser
-    def parse(obfuscator, config, input_io, output_io)
+    def parse(obfuscator : Triki, config : ConfigHash, input_io : IO, output_io : IO) : Nil
       while statement = input_io.gets(";\n")
         if table_data = parse_insert_statement(statement)
           table_name = table_data[:table_name]

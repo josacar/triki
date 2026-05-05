@@ -4,7 +4,7 @@ class Triki
     include Triki::InsertStatementParser
     include Triki::ConfigScaffoldGenerator
 
-    def parse_insert_statement(line)
+    def parse_insert_statement(line : String) : Table?
       return unless regex_match = insert_regex.match(line)
 
       Table.new(
@@ -13,14 +13,14 @@ class Triki
       )
     end
 
-    def rows_to_be_inserted(line) : Array(Array(String?))
+    def rows_to_be_inserted(line : String) : Array(Array(String?))
       match = insert_regex.match(line)
       values_str = match.try(&.post_match) || line
       values_str = values_str.lstrip('(').rstrip("; \t\n").sub(/\)$/, "")
       context_aware_sql_server_string_split(values_str)
     end
 
-    def make_valid_value_string(value) : RowContent
+    def make_valid_value_string(value : RowContent) : RowContent
       if value.nil?
         "NULL"
       elsif value.is_a?(String) && value.match(/^[A-Z]+\(.*?\)$/)
@@ -30,7 +30,7 @@ class Triki
       end
     end
 
-    def make_insert_statement(table_name, column_names, values, ignore = false) : String
+    def make_insert_statement(table_name : String, column_names : ColumnList, values : Array(Array(RowContent)), ignore = false) : String
       values_strings = values.map do |string_values|
         "(" + string_values.join(",") + ")"
       end.join(",")

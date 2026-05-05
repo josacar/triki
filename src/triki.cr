@@ -3,7 +3,11 @@ require "log"
 # Class for obfuscating MySQL, PostgreSQL, and SQL Server dumps. This can parse mysqldump outputs
 # when using the -c option, which includes column names in the insert statements.
 class Triki
-  property config, globally_kept_columns = Array(String).new, database_type = :mysql, scaffolded_tables, faker
+  property config : ConfigHash
+  property globally_kept_columns = Array(String).new
+  property database_type = :mysql
+  property scaffolded_tables : Hash(String, Int32)
+  property faker
   property? fail_on_unspecified_columns = false
 
   @faker = Faker
@@ -79,13 +83,13 @@ class Triki
 
   # Read an input stream and dump out an obfuscated output stream.  These streams could be any class implementing IO abstract class.
   # or STDIN and STDOUT.
-  def obfuscate(input_io, output_io)
+  def obfuscate(input_io : IO, output_io : IO) : Nil
     database_helper.parse(self, config, input_io, output_io)
   end
 
   # Read an input stream and dump out a config file scaffold.  These streams could be any class implementing IO abstract class.
   # or STDIN and STDOUT.
-  def scaffold(input_io, output_io)
+  def scaffold(input_io : IO, output_io : IO) : Nil
     database_helper.generate_config(self, config, input_io, output_io)
   end
 
@@ -106,7 +110,7 @@ class Triki
     config_columns - columns
   end
 
-  def check_for_defined_columns_not_in_table(table_name, columns)
+  def check_for_defined_columns_not_in_table(table_name : String, columns : Array(String)) : Nil
     missing_columns = extra_column_list(table_name, columns)
     return if missing_columns.empty?
 
@@ -116,13 +120,13 @@ class Triki
     raise RuntimeError.new(error_message)
   end
 
-  def missing_column_list(table_name : String, columns : Array(String)) : Array
+  def missing_column_list(table_name : String, columns : Array(String)) : Array(String)
     config_table = (config[table_name]? || ConfigTableHash.new).as(ConfigTableHash)
     config_columns = config_table.keys
     columns - (config_columns + globally_kept_columns).uniq
   end
 
-  def check_for_table_columns_not_in_definition(table_name, columns)
+  def check_for_table_columns_not_in_definition(table_name : String, columns : Array(String)) : Nil
     missing_columns = missing_column_list(table_name, columns)
     return if missing_columns.empty?
 
@@ -132,7 +136,7 @@ class Triki
     raise RuntimeError.new(error_message)
   end
 
-  def obfuscate_bulk_insert_statement(line, table_name : String, columns : ColumnList, ignore = false) : String
+  def obfuscate_bulk_insert_statement(line : String, table_name : String, columns : ColumnList, ignore = false) : String
     table_config = config[table_name]
 
     case table_config

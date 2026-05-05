@@ -66,21 +66,9 @@ end
 ```
 This would enforce consistent signatures and prevent regressions.
 
-## Missing / Incomplete Type Annotations
+## ~~Missing / Incomplete Type Annotations~~ — **FIXED**
 
-| File | Line | Method | Missing |
-|------|------|--------|---------|
-| `src/triki/base.cr` | 3 | `parse` | All 4 parameter types |
-| `src/triki.cr` | 63 | `database_helper` | Return type `Base` |
-| `src/triki.cr` | 129 | `obfuscate_bulk_insert_statement` | Return type `String` |
-| `src/triki.cr` | 6 | `property config` | Explicit type `ConfigHash` |
-| `src/triki.cr` | 6 | `property scaffolded_tables` | Explicit type (currently inferred as `Hash(String, Int32)`) |
-| `src/triki/config_applicator.cr` | 142 | `random_string` | Return type `String` |
-| `src/triki/config_applicator.cr` | 160 | `clean_quotes` | Parameter & return types |
-| `src/triki/config_applicator.cr` | 164 | `clean_bad_whitespace` | Parameter & return types |
-| `src/triki/config_parser.cr` | 3,11,23 | `cast_bindings`, `cast_table`, `cast_column` | Parameter types |
-| `src/triki/mysql.cr` | 32,41 | `write_rows`, `write_row_values` | Parameter & return types |
-| `src/triki/config_scaffold_generator.cr` | 86 | `formatted_line` | Parameter types |
+Added explicit parameter and return types across the codebase. All abstract methods in `base.cr` are now fully typed, and every concrete implementation in `Mysql`, `Postgres`, and `SqlServer` has matching signatures. `Triki#config` and `Triki#scaffolded_tables` properties now have explicit type annotations.
 
 ## Magic Numbers — **FIXED** (`9743190`)`
 

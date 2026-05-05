@@ -11,7 +11,7 @@ class Triki
     include Triki::InsertStatementParser
     include Triki::ConfigScaffoldGenerator
 
-    def parse_insert_statement(line)
+    def parse_insert_statement(line : String) : Table?
       return unless regex_match = insert_regex.match(line)
 
       Table.new(
@@ -21,7 +21,7 @@ class Triki
       )
     end
 
-    def make_insert_statement(table_name, column_names, values, ignore = false) : String
+    def make_insert_statement(table_name : String, column_names : ColumnList, values : Array(Array(RowContent)), ignore = false) : String
       String.build do |buffer|
         buffer << %{INSERT #{ignore ? "IGNORE " : ""}INTO `#{table_name}` (`#{column_names.join("`, `")}`) VALUES }
         write_rows(buffer, values)
@@ -29,7 +29,7 @@ class Triki
       end
     end
 
-    def write_rows(buffer : String::Builder, rows : Array(Array(RowContent)))
+    def write_rows(buffer : String::Builder, rows : Array(Array(RowContent))) : Nil
       rows.each_with_index do |row_values, i|
         buffer << "("
         write_row_values(buffer, row_values)
@@ -38,7 +38,7 @@ class Triki
       end
     end
 
-    def write_row_values(buffer : String::Builder, row_values : Array(RowContent))
+    def write_row_values(buffer : String::Builder, row_values : Array(RowContent)) : Nil
       row_values.each_with_index do |value, j|
         buffer << value
         buffer << "," if j < row_values.size - 1
@@ -49,7 +49,7 @@ class Triki
       /^\s*INSERT\s*(IGNORE )?\s*INTO `(.*?)` \((.*?)\) VALUES\s*/i
     end
 
-    def rows_to_be_inserted(line) : Rows
+    def rows_to_be_inserted(line : String) : Rows
       scanner = StringScanner.new(line)
       scanner.scan(insert_regex)
 
@@ -83,7 +83,7 @@ class Triki
       rows
     end
 
-    def make_valid_value_string(value) : RowContent
+    def make_valid_value_string(value : RowContent) : RowContent
       if value.nil?
         "NULL"
       elsif value =~ /^0x[0-9a-fA-F]+$/
