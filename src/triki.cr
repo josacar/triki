@@ -12,9 +12,9 @@ class Triki
   USERNAME_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_" + DIGIT_CHARS
   SENSIBLE_CHARS = USERNAME_CHARS + "+-=[{]}/?|!@#$%^&*()`~"
 
-  DEFAULT_INTEGER_RANGE  = 0..1000
-  DEFAULT_STRING_LENGTH  = 30
-  COLUMN_NAME_WIDTH      = 40
+  DEFAULT_INTEGER_RANGE   = 0..1000
+  DEFAULT_STRING_LENGTH   = 30
+  COLUMN_NAME_WIDTH       = 40
   PARSE_ERROR_PEEK_LENGTH = 80
 
   DEPRECATION_WARNING = "was not specified in the config. A future release will cause this to be an error. Please specify the table definition or set it to :keep."

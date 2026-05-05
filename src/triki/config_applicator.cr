@@ -46,69 +46,69 @@ class Triki
         end
 
         transformed_row[index] = case definition[:type]
-                        when :email
-                          hashed = Digest::MD5.hexdigest(row[index].to_s)[0...5]
-                          clean_quotes("#{faker.email}.#{hashed}.example.com")
-                        when :string
-                          random_string(length || DEFAULT_STRING_LENGTH, chars.as(String | Nil) || SENSIBLE_CHARS) if length.is_a?(Int32)
-                        when :lorem
-                          clean_bad_whitespace(clean_quotes(faker.lorem(number).join(".  ")))
-                        when :like_english
-                          clean_quotes(dictionary.random_sentences(number))
-                        when :name
-                          clean_quotes(faker.name)
-                        when :first_name
-                          clean_quotes(faker.first_name)
-                        when :last_name
-                          clean_quotes(faker.last_name)
-                        when :address
-                          clean_quotes("#{faker.street_address}\\n#{faker.city}, #{faker.state_abbr} #{faker.zip_code}")
-                        when :street_address
-                          clean_bad_whitespace(clean_quotes(faker.street_address))
-                        when :secondary_address
-                          clean_bad_whitespace(clean_quotes(faker.secondary_address))
-                        when :city
-                          clean_quotes(faker.city)
-                        when :state
-                          clean_quotes(faker.state_abbr)
-                        when :zip_code
-                          faker.zip_code
-                        when :phone
-                          clean_quotes(faker.phone_number)
-                        when :company
-                          clean_bad_whitespace(clean_quotes(faker.company))
-                        when :ipv4
-                          faker.ip_v4_address
-                        when :ipv6
-                          faker.ip_v6_address
-                        when :url
-                          clean_bad_whitespace(faker.url)
-                        when :integer
-                          random_integer(between).to_s
-                        when :fixed
-                          if one_of.is_a?(Array)
-                            one_of.sample.as(String | Int32)
-                          else
-                            string = definition[:string]
+                                 when :email
+                                   hashed = Digest::MD5.hexdigest(row[index].to_s)[0...5]
+                                   clean_quotes("#{faker.email}.#{hashed}.example.com")
+                                 when :string
+                                   random_string(length || DEFAULT_STRING_LENGTH, chars.as(String | Nil) || SENSIBLE_CHARS) if length.is_a?(Int32)
+                                 when :lorem
+                                   clean_bad_whitespace(clean_quotes(faker.lorem(number).join(".  ")))
+                                 when :like_english
+                                   clean_quotes(dictionary.random_sentences(number))
+                                 when :name
+                                   clean_quotes(faker.name)
+                                 when :first_name
+                                   clean_quotes(faker.first_name)
+                                 when :last_name
+                                   clean_quotes(faker.last_name)
+                                 when :address
+                                   clean_quotes("#{faker.street_address}\\n#{faker.city}, #{faker.state_abbr} #{faker.zip_code}")
+                                 when :street_address
+                                   clean_bad_whitespace(clean_quotes(faker.street_address))
+                                 when :secondary_address
+                                   clean_bad_whitespace(clean_quotes(faker.secondary_address))
+                                 when :city
+                                   clean_quotes(faker.city)
+                                 when :state
+                                   clean_quotes(faker.state_abbr)
+                                 when :zip_code
+                                   faker.zip_code
+                                 when :phone
+                                   clean_quotes(faker.phone_number)
+                                 when :company
+                                   clean_bad_whitespace(clean_quotes(faker.company))
+                                 when :ipv4
+                                   faker.ip_v4_address
+                                 when :ipv6
+                                   faker.ip_v6_address
+                                 when :url
+                                   clean_bad_whitespace(faker.url)
+                                 when :integer
+                                   random_integer(between).to_s
+                                 when :fixed
+                                   if one_of.is_a?(Array)
+                                     one_of.sample.as(String | Int32)
+                                   else
+                                     string = definition[:string]
 
-                            if string.is_a?(Proc)
-                              if string.is_a?(RowProc)
-                                string.call(row_hash)
-                              elsif string.is_a?(StringProc)
-                                string.call
-                              end
-                            else
-                              string.as(String)
-                            end
-                          end
-                        when :null
-                          nil
-                        when :keep
-                          row[index]?
-                        else
-                          Log.warn { "Keeping a column value by providing an unknown type (#{definition[:type]}) is deprecated.  Use :keep instead." }
-                          row[index]?
-                        end
+                                     if string.is_a?(Proc)
+                                       if string.is_a?(RowProc)
+                                         string.call(row_hash)
+                                       elsif string.is_a?(StringProc)
+                                         string.call
+                                       end
+                                     else
+                                       string.as(String)
+                                     end
+                                   end
+                                 when :null
+                                   nil
+                                 when :keep
+                                   row[index]?
+                                 else
+                                   Log.warn { "Keeping a column value by providing an unknown type (#{definition[:type]}) is deprecated.  Use :keep instead." }
+                                   row[index]?
+                                 end
       end
       transformed_row
     end

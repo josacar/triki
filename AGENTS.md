@@ -88,7 +88,7 @@ Column actions include: `:email`, `:name`, `:first_name`, `:last_name`, `:addres
 ### Code Style
 
 - **Crystal idiomatic style** – follow `crystal tool format` output
-- **Ameba linter** – config in `.ameba.yml` (GuardClause enabled)
+- **Ameba linter** – config in `.ameba.yml` (GuardClause enabled). Run `bin/ameba` and `crystal tool format` before every commit.
 - **Indentation**: 2 spaces (see `.editorconfig`)
 - **Naming**: `snake_case` for methods/variables, `PascalCase` for types
 - **Error raising**: Use `raise RuntimeError.new("descriptive message")` consistently — avoid bare `raise "string"` or `raise RuntimeError.new` without a message
