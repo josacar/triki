@@ -22,7 +22,7 @@ jobs:
     concurrency: ci-${{ github.ref }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: crystal-lang/install-crystal@v1
       - name: Install dependencies
         run: shards install
@@ -33,7 +33,7 @@ jobs:
         run: crystal docs --project-version="$(shards version)"
       - name: Upload artifact
         # Automatically uploads an artifact from the './_site' directory by default
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           path: 'docs'
   deploy:
