@@ -1,7 +1,5 @@
 class Triki
-  # Shared parsing logic for dialects that use semicolon-terminated INSERT statements.
-  #
-  # Included by `Mysql` and `SqlServer`.
+  # :nodoc:
   module InsertStatementParser
     # Iterates over the dump, parsing each INSERT statement and applying obfuscation.
     def parse(obfuscator : Triki, config : ConfigHash, input_io : IO, output_io : IO) : Nil

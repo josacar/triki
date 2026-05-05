@@ -1,9 +1,5 @@
 class Triki
-  # Abstract base for database-specific dump parsers.
-  #
-  # Concrete implementations (`Mysql`, `Postgres`, `SqlServer`) handle
-  # parsing INSERT/COPY statements, extracting rows, reassembling output,
-  # and quoting values for their respective dialects.
+  # :nodoc:
   abstract struct Base
     # Parses the full dump stream, applying obfuscation rules.
     abstract def parse(obfuscator : Triki, config : ConfigHash, input_io : IO, output_io : IO) : Nil

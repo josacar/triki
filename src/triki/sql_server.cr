@@ -3,10 +3,12 @@ class Triki
   #
   # Handles `INSERT INTO [dbo].[table] ... VALUES` statements.
   struct SqlServer < Base
+    # :nodoc:
     alias Table = NamedTuple(table_name: String, column_names: ColumnList)
     include Triki::InsertStatementParser
     include Triki::ConfigScaffoldGenerator
 
+    # :nodoc:
     def parse_insert_statement(line : String) : Table?
       return unless regex_match = insert_regex.match(line)
 

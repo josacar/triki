@@ -1,8 +1,5 @@
 class Triki
-  # Generates a configuration scaffold from an SQL dump.
-  #
-  # Included by all database helpers. Outputs placeholder `:keep` rules
-  # for every table and column found in the dump.
+  # :nodoc:
   module ConfigScaffoldGenerator
     macro included
       def table_data(line)

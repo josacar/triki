@@ -10,7 +10,9 @@ class Triki
   property config : ConfigHash
   property globally_kept_columns = Array(String).new
   property database_type = :mysql
+  # :nodoc:
   property scaffolded_tables : Hash(String, Int32)
+  # :nodoc:
   property faker
   property? fail_on_unspecified_columns = false
 
@@ -20,34 +22,48 @@ class Triki
   USERNAME_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_" + DIGIT_CHARS
   SENSIBLE_CHARS = USERNAME_CHARS + "+-=[{]}/?|!@#$%^&*()`~"
 
-  DEFAULT_INTEGER_RANGE   = 0..1000
-  DEFAULT_STRING_LENGTH   = 30
-  COLUMN_NAME_WIDTH       = 40
+  DEFAULT_INTEGER_RANGE = 0..1000
+  DEFAULT_STRING_LENGTH = 30
+  # :nodoc:
+  COLUMN_NAME_WIDTH = 40
+  # :nodoc:
   PARSE_ERROR_PEEK_LENGTH = 80
 
+  # :nodoc:
   DEPRECATION_WARNING = "was not specified in the config. A future release will cause this to be an error. Please specify the table definition or set it to :keep."
 
+  # :nodoc:
   Log = begin
     backend = ::Log::IOBackend.new(STDERR)
     ::Log.builder.bind("triki", :warn, backend)
     ::Log.for(self)
   end
 
+  # :nodoc:
   alias TableName = String
+  # :nodoc:
   alias ColumnName = String
+  # :nodoc:
   alias TruncateOrKeepTable = Symbol
+  # :nodoc:
   alias ColumnAction = Symbol
+  # :nodoc:
   alias Between = Range(Int32, Int32)
   alias ColumnList = Array(String)
   alias RowContent = String | Int32 | Nil
 
   alias RowAsHash = Hash(ColumnName, RowContent)
+  # :nodoc:
   alias IntRange = Range(Int32, Int32)
 
+  # :nodoc:
   alias BoolProc = Proc(RowAsHash, Bool)
+  # :nodoc:
   alias RowProc = Proc(RowAsHash, RowContent)
+  # :nodoc:
   alias StringProc = Proc(String)
 
+  # :nodoc:
   alias ConfigColumnHash = Hash(Symbol, Array(Regex) |
                                         Array(String) |
                                         Int32 |
@@ -74,6 +90,7 @@ class Triki
     @scaffolded_tables = {} of String => Int32
   end
 
+  # :nodoc:
   def database_helper : Base
     @database_helper ||= case @database_type
                          when :sql_server
@@ -101,6 +118,7 @@ class Triki
     database_helper.generate_config(self, config, input_io, output_io)
   end
 
+  # :nodoc:
   def reassemble_each_insert(line : String, table_name : String, columns : ColumnList, ignore = false, &)
     output = database_helper.rows_to_be_inserted(line).map do |sub_insert|
       result = yield(sub_insert)
@@ -111,6 +129,7 @@ class Triki
     database_helper.make_insert_statement(table_name, columns, output, ignore)
   end
 
+  # :nodoc:
   def extra_column_list(table_name : String, columns : Array(String))
     config_table = (config[table_name]? || ConfigTableHash.new).as(ConfigTableHash)
     config_columns = config_table.keys
@@ -118,6 +137,7 @@ class Triki
     config_columns - columns
   end
 
+  # :nodoc:
   def check_for_defined_columns_not_in_table(table_name : String, columns : Array(String)) : Nil
     missing_columns = extra_column_list(table_name, columns)
     return if missing_columns.empty?
@@ -128,12 +148,14 @@ class Triki
     raise RuntimeError.new(error_message)
   end
 
+  # :nodoc:
   def missing_column_list(table_name : String, columns : Array(String)) : Array(String)
     config_table = (config[table_name]? || ConfigTableHash.new).as(ConfigTableHash)
     config_columns = config_table.keys
     columns - (config_columns + globally_kept_columns).uniq
   end
 
+  # :nodoc:
   def check_for_table_columns_not_in_definition(table_name : String, columns : Array(String)) : Nil
     missing_columns = missing_column_list(table_name, columns)
     return if missing_columns.empty?
@@ -144,6 +166,7 @@ class Triki
     raise RuntimeError.new(error_message)
   end
 
+  # :nodoc:
   def obfuscate_bulk_insert_statement(line : String, table_name : String, columns : ColumnList, ignore = false) : String
     table_config = config[table_name]
 

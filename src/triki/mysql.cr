@@ -5,14 +5,19 @@ class Triki
   #
   # Handles `INSERT` and `INSERT IGNORE` statements produced by `mysqldump -c`.
   struct Mysql < Base
+    # :nodoc:
     alias Field = String?
+    # :nodoc:
     alias Fields = Array(Field)
+    # :nodoc:
     alias Rows = Array(Fields)
+    # :nodoc:
     alias Table = NamedTuple(ignore: Bool, table_name: String, column_names: ColumnList)
 
     include Triki::InsertStatementParser
     include Triki::ConfigScaffoldGenerator
 
+    # :nodoc:
     def parse_insert_statement(line : String) : Table?
       return unless regex_match = insert_regex.match(line)
 
@@ -31,6 +36,7 @@ class Triki
       end
     end
 
+    # :nodoc:
     def write_rows(buffer : String::Builder, rows : Array(Array(RowContent))) : Nil
       rows.each_with_index do |row_values, i|
         buffer << "("
@@ -40,6 +46,7 @@ class Triki
       end
     end
 
+    # :nodoc:
     def write_row_values(buffer : String::Builder, row_values : Array(RowContent)) : Nil
       row_values.each_with_index do |value, j|
         buffer << value

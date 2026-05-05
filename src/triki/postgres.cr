@@ -3,6 +3,7 @@ class Triki
   #
   # Handles `COPY ... FROM stdin` statements produced by `pg_dump`.
   struct Postgres < Base
+    # :nodoc:
     alias Table = NamedTuple(table_name: String, column_names: ColumnList)
     include Triki::ConfigScaffoldGenerator
 
@@ -72,6 +73,7 @@ class Triki
       [row]
     end
 
+    # :nodoc:
     def parse_copy_statement(line : String) : Table?
       return unless regex_match = /^\s*COPY (.*?) \((.*?)\) FROM\s*/i.match(line)
 
@@ -93,6 +95,7 @@ class Triki
       end
     end
 
+    # :nodoc:
     def parse_insert_statement(line : String) : Regex::MatchData?
       /^\s*INSERT INTO/i.match(line)
     end

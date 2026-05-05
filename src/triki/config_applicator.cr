@@ -121,12 +121,14 @@ class Triki
       transformed_row
     end
 
+    # :nodoc:
     def self.row_as_hash(row : Array, columns : Array) : RowAsHash
       columns.zip(row).each_with_object(RowAsHash.new) do |(name, value), row_as_hash|
         row_as_hash[name] = value
       end
     end
 
+    # :nodoc:
     def self.make_conditional_method(conditional_method, index, row) : Proc(RowAsHash, Bool)
       return conditional_method if conditional_method.is_a?(Proc)
 
@@ -142,10 +144,12 @@ class Triki
       end
     end
 
+    # :nodoc:
     def self.random_integer(between : IntRange) : Int32
       rand(between)
     end
 
+    # :nodoc:
     def self.random_string(length_or_range : Int32 | IntRange, chars : String) : String
       range = case length_or_range
               when .is_a?(Int32)
@@ -162,10 +166,12 @@ class Triki
       end
     end
 
+    # :nodoc:
     def self.clean_quotes(value : String) : String
       value.gsub(/['"]/, "")
     end
 
+    # :nodoc:
     def self.clean_bad_whitespace(value : String) : String
       value.gsub(/[\n\t\r]/, "")
     end

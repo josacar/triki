@@ -1,4 +1,5 @@
 class Triki
+  # :nodoc:
   module ConfigParser
     def self.cast_bindings(bindings : ConfigHash) : ConfigHash
       type_hash = ConfigHash.new
