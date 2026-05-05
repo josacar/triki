@@ -117,7 +117,7 @@ class Triki
       end
     end
 
-    def self.make_conditional_method(conditional_method, index, row) : Proc
+    def self.make_conditional_method(conditional_method, index, row) : Proc(RowAsHash, Bool)
       return conditional_method if conditional_method.is_a?(Proc)
 
       if conditional_method == :blank

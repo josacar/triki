@@ -89,7 +89,7 @@ class Triki
     database_helper.generate_config(self, config, input_io, output_io)
   end
 
-  def reassemble_each_insert(line : String, table_name : String, columns, ignore = false, &)
+  def reassemble_each_insert(line : String, table_name : String, columns : ColumnList, ignore = false, &)
     output = database_helper.rows_to_be_inserted(line).map do |sub_insert|
       result = yield(sub_insert)
       result.map do |i|

@@ -32,7 +32,7 @@ class Triki
           buffer.clear
         end
 
-        if missing_columns.size == 0 && extra_columns.size == 0
+        if missing_columns.empty? && extra_columns.empty?
           # all columns are accounted for
           buffer.puts("\n# All columns in the config for #{table_name.upcase} are present and accounted for.")
         else
