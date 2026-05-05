@@ -28,7 +28,7 @@ jobs:
         run: shards install
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v2
+        uses: actions/configure-pages@v5
       - name: Build docs
         run: crystal docs --project-version="$(shards version)"
       - name: Upload artifact
@@ -45,4 +45,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
