@@ -303,6 +303,11 @@ describe Triki::ConfigApplicator do
         str.each_char { |char| alphabet.should contain(char) }
       end
     end
+
+    it "produces a string of exactly the requested length" do
+      str = Triki::ConfigApplicator.random_string(25, Triki::SENSIBLE_CHARS)
+      str.size.should eq(25)
+    end
   end
 
   describe ".random_english_sentences" do
@@ -332,6 +337,55 @@ describe Triki::ConfigApplicator do
         word_count.should be >= 3
         word_count.should be <= 7
       end
+    end
+  end
+
+  describe ".clean_quotes" do
+    it "removes single and double quotes" do
+      Triki::ConfigApplicator.clean_quotes("foo'bar\"baz").should eq("foobarbaz")
+    end
+
+    it "returns the string unchanged when there are no quotes" do
+      Triki::ConfigApplicator.clean_quotes("foobar").should eq("foobar")
+    end
+  end
+
+  describe ".clean_bad_whitespace" do
+    it "removes newlines, tabs, and carriage returns" do
+      Triki::ConfigApplicator.clean_bad_whitespace("a\nb\tc\r").should eq("abc")
+    end
+  end
+
+  describe ".make_conditional_method" do
+    it "returns the given Proc unchanged" do
+      original = Proc(Triki::RowAsHash, Bool).new { true }
+      result = Triki::ConfigApplicator.make_conditional_method(original, 0, ["x"])
+      result.should eq(original)
+    end
+
+    it "creates a :blank checker that skips non-empty values" do
+      checker = Triki::ConfigApplicator.make_conditional_method(:blank, 0, ["hello"])
+      checker.call({"a" => "hello"} of String => Triki::RowContent).should be_false
+    end
+
+    it "creates a :blank checker that matches empty strings" do
+      checker = Triki::ConfigApplicator.make_conditional_method(:blank, 0, [""])
+      checker.call({"a" => ""} of String => Triki::RowContent).should be_true
+    end
+
+    it "creates a :blank checker that matches nil" do
+      checker = Triki::ConfigApplicator.make_conditional_method(:blank, 0, [nil])
+      checker.call({"a" => nil} of String => Triki::RowContent).should be_true
+    end
+
+    it "creates a :nil checker that matches nil" do
+      checker = Triki::ConfigApplicator.make_conditional_method(:nil, 0, [nil])
+      checker.call({"a" => nil} of String => Triki::RowContent).should be_true
+    end
+
+    it "creates a :nil checker that does not match non-nil" do
+      checker = Triki::ConfigApplicator.make_conditional_method(:nil, 0, ["x"])
+      checker.call({"a" => "x"} of String => Triki::RowContent).should be_false
     end
   end
 end
