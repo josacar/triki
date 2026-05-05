@@ -44,6 +44,8 @@ class Triki
         obfuscator.scaffolded_tables[table_name] = 1
       end
 
+      return unless buffer.pos > 0
+
       buffer.seek(-1, IO::Seek::Current)
       buffer.puts
       buffer.to_s(output_io)
